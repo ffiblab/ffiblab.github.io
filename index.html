@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PenSound — Every stroke, a sound.</title>
+  <meta name="description" content="PenSound brings the satisfying sounds of real drawing tools to your digital tablet. Pencil, colored pencil, fountain pen, crayon, and marker — react to pressure, speed, and tilt." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #3B82F6;
+      --blue-light: #60A5FA;
+      --blue-pale: #DBEAFE;
+      --blue-ghost: rgba(59,130,246,0.08);
+      --ink: #1a1a2e;
+      --ink-mid: #4a5568;
+      --ink-light: #94a3b8;
+      --white: #ffffff;
+      --off-white: #f8faff;
+      --paper: #f4f6fb;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      background: var(--white);
+      color: var(--ink);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(59,130,246,0.08);
+      transition: background 0.3s;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+    }
+
+    .nav-name {
+      font-family: 'Fraunces', serif;
+      font-weight: 300;
+      font-size: 18px;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      background: var(--blue);
+      color: white;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 400;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+
+
+5%   { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 700px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 50px;
+      font-size: 12px;
+      color: var(--blue);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      background: rgba(59,130,246,0.04);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    .hero-app-icon {
+      width: 96px; height: 96px;
+      border-radius: 22px;
+      margin: 0 auto 32px;
+      display: block;
+      box-shadow: 0 24px 60px rgba(59,130,246,0.25), 0 4px 16px rgba(0,0,0,0.08);
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 200;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 12px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .hero-tagline {
+      font-size: 18px;
+      color: var(--ink-mid);
+      margin-bottom: 40px;
+      font-weight: 300;
+      letter-spacing: 0.01em;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .btn-primary {
+      padding: 14px 32px;
+      background: var(--blue);
+      color: white;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 400;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(59,130,246,0.35);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(59,130,246,0.4);
+    }
+
+    .btn-secondary {
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--ink-mid);
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 400;
+      text-decoration: none;
+      border: 1px solid rgba(0,0,0,0.12);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+    .hero-meta {
+      margin-top: 56px;
+      font-size: 13px;
+      color: var(--ink-light);
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    /* scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.4;
+      animation: fadeIn 1s 1.2s ease both;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--blue), transparent);
+      animation: scrollLine 1.8s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ─── SECTION SHARED ─── */
+    section {
+      padding: 100px 24px;
+    }
+
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 200;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+
+    .section-title em { font-style: italic; color: var(--blue); }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--ink-mid);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+
+    /* ─── TOOL VIDEO PLAYER ─── */
+    .tool-card { cursor: pointer; }
+
+    .tool-card.active {
+      border-color: rgba(59,130,246,0.4);
+      background: rgba(59,130,246,0.03);
+    }
+
+    .tool-card.active .tool-icon-wrap {
+      background: rgba(59,130,246,0.15);
+    }
+
+    .tool-video-wrap {
+      grid-column: 1 / -1;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .tool-video-wrap.open {
+      max-height: 640px;
+      opacity: 1;
+    }
+
+    .tool-video-inner {
+      background: var(--paper);
+      border-radius: 20px;
+      border: 1px solid rgba(59,130,246,0.1);
+      overflow: hidden;
+      margin-top: 16px;
+      position: relative;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-video-inner video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .tool-video-placeholder {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-light);
+      font-size: 13px;
+    }
+
+    .tool-video-placeholder svg {
+      width: 32px; height: 32px;
+      opacity: 0.35;
+      color: var(--blue);
+    }
+
+    /* ─── TOOLS ─── */
+    .tools-section { background: var(--off-white); }
+
+    .tools-header { margin-bottom: 56px; }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .tool-card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid rgba(59,130,246,0.08);
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(59,130,246,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(59,130,246,0.10);
+    }
+
+    .tool-icon-wrap {
+      width: 56px; height: 56px;
+      background: var(--blue-ghost);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-icon-wrap svg {
+      width: 28px; height: 28px;
+      color: var(--blue);
+    }
+
+    .tool-name {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .tool-desc {
+      font-size: 12px;
+      color: var(--ink-light);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ─── FEATURES ─── */
+    .features-section { background: white; }
+
+    .features-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-top: 60px;
+    }
+
+    .feature-list { display: flex; flex-direction: column; gap: 0; }
+
+    .feature-item {
+      display: flex;
+      gap: 20px;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: opacity 0.3s;
+    }
+
+    .feature-item:last-child { border-bottom: none; }
+
+    .feature-num {
+      font-family: 'Fraunces', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--blue-light);
+      min-width: 24px;
+      padding-top: 3px;
+    }
+
+    .feature-text { flex: 1; }
+
+    .feature-title {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .feature-body {
+      font-size: 13px;
+      color: var(--ink-light);
+      line-height: 1.6;
+    }
+
+    /* screenshot placeholder */
+    .features-visual {
+      position: relative;
+    }
+
+    .screenshot-frame {
+      background: var(--paper);
+      border-radius: 28px;
+      padding: 32px;
+      border: 1px solid rgba(59,130,246,0.1);
+      box-shadow: 0 32px 80px rgba(59,130,246,0.12), 0 4px 16px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+
+    /* wave graphic placeholder */
+    .wave-vis {
+      margin-top: 20px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 48px;
+      padding: 0 4px;
+    }
+
+    .wave-bar {
+      flex: 1;
+      background: var(--blue-light);
+      border-radius: 2px;
+      opacity: 0.6;
+      animation: waveBounce 1.2s ease-in-out infinite;
+    }
+
+    @keyframes waveBounce {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+
+
+    /* ─── PRICING ─── */
+    .pricing-section { background: var(--off-white); }
+
+    .pricing-card {
+      max-width: 440px;
+      margin: 56px auto 0;
+      background: white;
+      border-radius: 28px;
+      padding: 48px 40px;
+      border: 1px solid rgba(59,130,246,0.15);
+      box-shadow: 0 24px 64px rgba(59,130,246,0.10);
+      text-align: center;
+    }
+
+    .pricing-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--blue-ghost);
+      border-radius: 50px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 24px;
+    }
+
+    .pricing-price {
+      font-family: 'Fraunces', serif;
+      font-size: 64px;
+      font-weight: 200;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-price sup {
+      font-size: 28px;
+      vertical-align: super;
+      font-weight: 300;
+    }
+
+    .pricing-sub {
+      font-size: 13px;
+      color: var(--ink-light);
+      margin-bottom: 36px;
+    }
+
+    .pricing-perks {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .pricing-perks li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-mid);
+    }
+
+    .perk-check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--blue-ghost);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .perk-check svg {
+      width: 10px; height: 10px;
+      stroke: var(--blue);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pricing-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--blue);
+      color: white;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 400;
+      text-decoration: none;
+      margin-bottom: 14px;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 24px rgba(59,130,246,0.3);
+    }
+
+    .pricing-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .pricing-trial {
+      font-size: 12px;
+      color: var(--ink-light);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--ink);
+      padding: 60px 24px 48px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand .nav-name { color: rgba(255,255,255,0.85); font-size: 20px; }
+
+    .footer-tagline {
+      font-size: 13px;
+      margin-top: 6px;
+      font-style: italic;
+      font-family: 'Fraunces', serif;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .footer-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .footer-meta a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-meta a:hover { color: rgba(255,255,255,0.8); }
+
+    .footer-bottom {
+      max-width: 1000px;
+      margin: 40px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .tools-grid { grid-template-columns: repeat(3, 1fr); }
+      .tools-grid .tool-card:nth-child(4),
+      .tools-grid .tool-card:nth-child(5) { grid-column: span 1; }
+      .features-layout { grid-template-columns: 1fr; }
+      .features-visual { order: -1; }
+      .footer-meta { text-align: left; }
+    }
+
+    @media (max-width: 480px) {
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+      .tool-card:last-child { grid-column: span 2; }
+      .pricing-card { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-brand">
+      <img src="icon.png" alt="PenSound" class="nav-icon" onerror="this.style.display='none'" />
+      <span class="nav-name">PenSound</span>
+    </a>
+    <a href="#pricing" class="nav-cta">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <div class="hero-content" style="opacity:1;transform:none;">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        macOS App
+      </div>
+      <img src="icon.png" alt="PenSound Icon" class="hero-app-icon" />
+      <h1 class="hero-title">Every stroke,<br><em>a sound.</em></h1>
+      <p class="hero-tagline">The sound of real drawing tools — on any tablet, in any app.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">
+          Download Free Trial
+        </a>
+        <a href="#features" class="btn-secondary">Learn more</a>
+      </div>
+      <p class="hero-meta">macOS 14 Sonoma or later &nbsp;·&nbsp; 14-day free trial &nbsp;·&nbsp; One-time purchase &nbsp;·&nbsp; EN &nbsp;KO &nbsp;JA &nbsp;ZH</p>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="tools-section">
+    <div class="section-inner">
+      <div class="tools-header reveal">
+        <p class="section-label">Sound Library</p>
+        <h2 class="section-title">Five tools.<br><em>Five textures.</em></h2>
+        <p class="section-desc">Each instrument is crafted from real recordings, shaped by how you actually draw.</p>
+      </div>
+      <div class="tools-grid" id="toolsGrid">
+        <!-- Pencil -->
+        <div class="tool-card reveal" data-tool="pencil" style="transition-delay:0.05s">
+          <div class="tool-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M9 4 h6 v12 l-3 5 l-3 -5 z"/><path d="M9 7 h6"/><path d="M11 7 v9"/><path d="M13 7 v9"/><path d="M9 16 q 1.5 -1.5 3 0 q 1.5 -1.5 3 0"/></g></svg>
+          </div>
+          <span class="tool-name">Pencil</span>
+          <span class="tool-desc">Soft graphite scratch with paper grain</span>
+        </div>
+        <!-- Color Pencil -->
+        <div class="tool-card reveal" data-tool="coloredpencil" style="transition-delay:0.10s">
+          <div class="tool-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M15 16 v-8 a3 3 0 0 0 -6 0 v8 l3 5 l3 -5 z"/><path d="M9 16 q 1.5 -1.5 3 0 q 1.5 -1.5 3 0"/><path d="M9 10 l6 2"/><path d="M9 13 l6 2"/></g></svg>
+          </div>
+          <span class="tool-name">Colored Pencil</span>
+          <span class="tool-desc">Waxy and smooth, with a faint whisper of friction</span>
+        </div>
+        <!-- Fountain Pen -->
+        <div class="tool-card reveal" data-tool="fountainpen" style="transition-delay:0.15s">
+          <div class="tool-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M10 2 h4 l-1 10 h-2 z"/><path d="M11 12 v3 h2 v-3"/><path d="M11 15 l1 6 l1 -6"/><path d="M12 15 v3"/><path d="M14 4 c 1 0 1.5 0.5 1.5 1 v4 c 0 0.5 -0.5 1 -1.5 1"/></g></svg>
+          </div>
+          <span class="tool-name">Fountain Pen</span>
+          <span class="tool-desc">Sharp metal nib gliding through ink on paper</span>
+        </div>
+        <!-- Crayon -->
+        <div class="tool-card reveal" data-tool="crayon" style="transition-delay:0.20s">
+          <div class="tool-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M8 4 h8 v13 l-2 4 h-4 l-2 -4 z"/><path d="M8 8 h8"/><path d="M8 14 h8"/><path d="M8 11 q 2 -2 4 0 t 4 0"/></g></svg>
+          </div>
+          <span class="tool-name">Crayon</span>
+          <span class="tool-desc">Firm wax pressed heavy against the page</span>
+        </div>
+        <!-- Marker -->
+        <div class="tool-card reveal" data-tool="marker" style="transition-delay:0.25s">
+          <div class="tool-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M7 2 h10 v12 h-10 z"/><path d="M7 8 h10"/><path d="M8 14 h8 v2 h-8 z"/><path d="M9 16 v5 l5 -2 v-3"/></g></svg>
+          </div>
+          <span class="tool-name">Marker</span>
+          <span class="tool-desc">Clean, decisive strokes with ink body</span>
+        </div>
+        <!-- Video Player -->
+        <div class="tool-video-wrap" id="toolVideoWrap">
+          <div class="tool-video-inner">
+            <video id="toolVideo" playsinline autoplay loop>
+              <source id="toolVideoSrc" src="" type="video/mp4" />
+            </video>
+            <div class="tool-video-placeholder" id="toolVideoPlaceholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+              <span>Click a tool to hear it</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="section-inner">
+      <div class="features-layout">
+        <div class="feature-list reveal">
+          <p class="section-label">How It Works</p>
+          <h2 class="section-title" style="margin-bottom:40px">Sound that<br>follows your <em>hand.</em></h2>
+          <div class="feature-item">
+            <span class="feature-num">01</span>
+            <div class="feature-text">
+              <p class="feature-title">Pressure, speed, and tilt</p>
+              <p class="feature-body">Every variable of your stroke shapes the sound in real time — press harder for a denser tone, move faster for a sharper crackle, tilt the pen and the texture shifts, just like on paper.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-num">02</span>
+            <div class="feature-text">
+              <p class="feature-title">Fine-tune to your hand</p>
+              <p class="feature-body">Every tablet feels different. Customize the pressure curve to match yours, and dial in the tone of each tool to exactly the sound you want to hear.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-num">03</span>
+            <div class="feature-text">
+              <p class="feature-title">Works everywhere, invisibly</p>
+              <p class="feature-body">PenSound hooks into your tablet driver at the system level — no plugins, no per-app setup. Prefer to keep it to specific apps? Add or exclude any app in one click.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-num">04</span>
+            <div class="feature-text">
+              <p class="feature-title">Mute key</p>
+              <p class="feature-body">Hold Space to pan the canvas — PenSound stays quiet while you're not drawing, so the sound never breaks your flow.</p>
+            </div>
+          </div>
+        </div>
+        <div class="features-visual reveal" style="transition-delay:0.2s">
+          <div class="screenshot-frame">
+            <img src="screenshot.png" alt="PenSound UI" class="screenshot-img"
+              onerror="this.style.display='none'; document.getElementById('waveFallback').style.display='block'" />
+            <div id="waveFallback" style="display:none">
+              <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border-radius:12px; height:320px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px">
+                <div style="font-family:'Fraunces',serif; font-size:18px; color:var(--blue); font-style:italic; opacity:0.6">PenSound</div>
+                <div style="display:flex; align-items:flex-end; gap:4px; height:60px">
+                  <!-- animated bars -->
+                  <div class="wave-bar" style="height:30%; animation-delay:0s"></div>
+                  <div class="wave-bar" style="height:60%; animation-delay:0.1s"></div>
+                  <div class="wave-bar" style="height:90%; animation-delay:0.2s"></div>
+                  <div class="wave-bar" style="height:70%; animation-delay:0.3s"></div>
+                  <div class="wave-bar" style="height:100%; animation-delay:0.4s"></div>
+                  <div class="wave-bar" style="height:80%; animation-delay:0.5s"></div>
+                  <div class="wave-bar" style="height:50%; animation-delay:0.6s"></div>
+                  <div class="wave-bar" style="height:75%; animation-delay:0.7s"></div>
+                  <div class="wave-bar" style="height:40%; animation-delay:0.8s"></div>
+                  <div class="wave-bar" style="height:65%; animation-delay:0.9s"></div>
+                  <div class="wave-bar" style="height:85%; animation-delay:1.0s"></div>
+                  <div class="wave-bar" style="height:55%; animation-delay:1.1s"></div>
+                </div>
+                <div style="font-size:12px; color:var(--ink-light)">Reacting to every stroke</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="section-inner" style="text-align:center">
+      <div class="reveal">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">One price.<br><em>Yours forever.</em></h2>
+
+      </div>
+      <div class="pricing-card reveal" style="transition-delay:0.15s">
+        <span class="pricing-tag">Launch Price</span>
+        <div class="pricing-price"><sup>$</sup>4.99</div>
+        <p class="pricing-sub">
+          Early adopter price — won't last.<br>
+          No subscriptions. No renewals.
+        </p>
+        <ul class="pricing-perks">
+          <li>
+            <span class="perk-check">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </span>
+            Lifetime license — yours forever
+          </li>
+          <li>
+            <span class="perk-check">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </span>
+            All future updates included
+          </li>
+          <li>
+            <span class="perk-check">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </span>
+            Use on up to 2 Macs
+          </li>
+          <li>
+            <span class="perk-check">
+              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+            </span>
+            14-day free trial, no sign-up needed
+          </li>
+        </ul>
+        <a href="#" class="pricing-btn">Download &amp; Try Free for 14 Days</a>
+        <p class="pricing-trial">No sign-up needed. Purchase only after you love it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-name" style="font-family:'Fraunces',serif; font-weight:300; color:rgba(255,255,255,0.85); font-size:20px">PenSound</div>
+        <div class="footer-tagline">Every stroke, a sound.</div>
+      </div>
+      <div class="footer-meta">
+        <a href="/cdn-cgi/l/email-protection#c3a5a5aaa1edafa2a183a4aea2aaafeda0acae">Contact</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 PenSound by ffib lab. All rights reserved.</span>
+      <span>macOS 14 Sonoma or later</span>
+    </div>
+  </footer>
+
+  <!-- scroll stroke + reveal -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // ── Tool card video interaction ──────────────────────────
+    const toolCards = document.querySelectorAll('.tool-card[data-tool]');
+    const videoWrap = document.getElementById('toolVideoWrap');
+    const videoEl   = document.getElementById('toolVideo');
+    const videoSrc  = document.getElementById('toolVideoSrc');
+    const placeholder = document.getElementById('toolVideoPlaceholder');
+    let activeCard = null;
+
+    toolCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const tool = card.dataset.tool;
+
+        // Toggle off if same card clicked again
+        if (activeCard === card) {
+          card.classList.remove('active');
+          videoWrap.classList.remove('open');
+          videoEl.pause();
+          activeCard = null;
+          return;
+        }
+
+        // Deactivate previous
+        if (activeCard) activeCard.classList.remove('active');
+        card.classList.add('active');
+        activeCard = card;
+
+        // Swap video source
+        const src = 'videos/' + tool + '.mp4';
+        videoSrc.src = src;
+        videoEl.load();
+
+        // Show video, hide placeholder once loaded
+        videoEl.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        // Handle missing file gracefully
+        videoEl.onerror = () => {
+          videoEl.style.display = 'none';
+          placeholder.style.display = 'flex';
+          placeholder.querySelector('span').textContent = 'Video coming soon';
+        };
+
+        videoEl.oncanplay = () => {
+          videoEl.play();
+        };
+
+        // Open panel
+        videoWrap.classList.add('open');
+
+        // Scroll video into view smoothly
+        setTimeout(() => {
+          videoWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+      });
+    });
+
+    // ── Scroll-progress stroke (dashoffset reveal) ───────────
+    // One continuous S-curve path fixed in document space,
+    // rendered as an absolutely-positioned SVG behind content.
+    // stroke-dashoffset is driven by scroll progress so the line
+    // appears to be drawn from top to bottom as the user scrolls.
+
+    const strokeSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    strokeSvg.setAttribute('id','strokeSvg');
+    strokeSvg.setAttribute('aria-hidden','true');
+    Object.assign(strokeSvg.style, {
+      position:'absolute', top:'0', left:'0',
+      width:'100%', height:'100%',
+      pointerEvents:'none', zIndex:'0',
+      overflow:'visible'
+    });
+
+    // Insert as first child of body so it sits behind everything
+    document.body.insertBefore(strokeSvg, document.body.firstChild);
+    document.body.style.position = 'relative';
+
+    const strokePath = document.createElementNS('http://www.w3.org/2000/svg','path');
+    strokePath.setAttribute('fill','none');
+    strokePath.setAttribute('stroke','rgba(59,130,246,0.15)');
+    strokePath.setAttribute('stroke-width','1.5');
+    strokePath.setAttribute('stroke-linecap','round');
+    strokePath.setAttribute('stroke-linejoin','round');
+    strokeSvg.appendChild(strokePath);
+
+    function buildStroke() {
+      const W = window.innerWidth;
+      const H = document.body.scrollHeight;
+      const vH = window.innerHeight;
+      const segH = vH * 0.9;
+
+      // Build S-curve waypoints in absolute document coordinates
+      // Alternates between right and left side
+      const waypoints = [];
+      let y = vH * 0.15;
+      let side = 0; // 0=right, 1=left
+      const xR = W * 0.80;
+      const xL = W * 0.20;
+
+      waypoints.push({ x: xR, y });
+
+      while (y < H + segH) {
+        y += segH;
+        side = 1 - side;
+        waypoints.push({ x: side === 0 ? xR : xL, y });
+      }
+
+      // Build smooth bezier path through waypoints
+      let d = `M${waypoints[0].x},${waypoints[0].y}`;
+      for (let i = 1; i < waypoints.length; i++) {
+        const p = waypoints[i - 1];
+        const c = waypoints[i];
+        const midY = p.y + (c.y - p.y) * 0.5;
+        d += ` C${p.x},${midY} ${c.x},${midY} ${c.x},${c.y}`;
+      }
+
+      strokePath.setAttribute('d', d);
+
+      // Measure total path length and set dasharray
+      const len = strokePath.getTotalLength();
+      strokePath.setAttribute('stroke-dasharray', len);
+      strokePath.dataset.len = len;
+
+      // Apply current scroll position immediately
+      applyScroll();
+    }
+
+    function applyScroll() {
+      const len = parseFloat(strokePath.dataset.len || 0);
+      if (!len) return;
+      const scrollY = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
+      // offset goes from len (hidden) → 0 (fully drawn)
+      const offset = len * (1 - progress);
+      strokePath.setAttribute('stroke-dashoffset', offset);
+    }
+
+    window.addEventListener('scroll', applyScroll, { passive: true });
+    window.addEventListener('resize', () => { buildStroke(); }, { passive: true });
+
+    // Build after fonts/layout settle
+    if (document.readyState === 'complete') {
+      buildStroke();
+    } else {
+      window.addEventListener('load', buildStroke);
+    }
+
+    // ── Reveal ──────────────────────────────────────────────
+    // ── Reveal ──────────────────────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
