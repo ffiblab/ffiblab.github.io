@@ -929,7 +929,7 @@
         <div class="footer-tagline">Every stroke, a sound.</div>
       </div>
       <div class="footer-meta">
-        <a href="mailto:hello@ffiblab.com">Contact</a>
+        <a href="/cdn-cgi/l/email-protection#cda5a8a1a1a28dababa4afa1acafe3aea2a0">Contact</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="refund.html">Refund Policy</a>
       </div>
@@ -941,7 +941,7 @@
   </footer>
 
   <!-- scroll stroke + reveal -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ── Tool card video interaction ──────────────────────────
     const toolCards = document.querySelectorAll('.tool-card[data-tool]');
     const videoWrap = document.getElementById('toolVideoWrap');
@@ -1021,10 +1021,7 @@
     const strokePath = document.createElementNS('http://www.w3.org/2000/svg','path');
     strokePath.setAttribute('fill','none');
     strokePath.setAttribute('stroke','rgba(59,130,246,0.15)');
-    strokePath.setAttribute('stroke-width','1.5');
-    strokePath.setAttribute('stroke-linecap','round');
-    strokePath.setAttribute('stroke-linejoin','round');
-    strokeSvg.appendChild(strokePath);
+    strokePath.setAttribute('stroke-wid(strokePath);
 
     function buildStroke() {
       const W = window.innerWidth;
@@ -1096,4 +1093,12 @@
       entries.forEach(e => {
         if (e.isIntersecting) {
           e.target.classList.add('visible');
-          revealObserver.unobser
+          revealObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
