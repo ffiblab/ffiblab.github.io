@@ -679,9 +679,14 @@
     }
 
     .reveal {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.hidden {
       opacity: 0;
       transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
     .reveal.visible {
@@ -1087,7 +1092,6 @@
     }
 
     // ── Reveal ──────────────────────────────────────────────
-    // ── Reveal ──────────────────────────────────────────────
     const revealEls = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -1097,7 +1101,10 @@
         }
       });
     }, { threshold: 0.08 });
-    revealEls.forEach(el => revealObserver.observe(el));
+    revealEls.forEach(el => {
+      el.classList.add('hidden');
+      revealObserver.observe(el);
+    });
   </script>
 
 </body>
