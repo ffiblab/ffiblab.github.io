@@ -60,7 +60,6 @@
 
     .nav-icon {
       width: 32px; height: 32px;
-      border-radius: 8px;
     }
 
     .nav-name {
@@ -138,10 +137,8 @@
 
     .hero-app-icon {
       width: 96px; height: 96px;
-      border-radius: 22px;
       margin: 0 auto 32px;
       display: block;
-      box-shadow: 0 24px 60px rgba(59,130,246,0.25), 0 4px 16px rgba(0,0,0,0.08);
       animation: fadeUp 0.8s 0.1s ease both;
     }
 
@@ -595,6 +592,19 @@
 
     .pricing-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
+    .pricing-btn-buy {
+      background: transparent;
+      color: var(--blue);
+      border: 1.5px solid rgba(59,130,246,0.3);
+      box-shadow: none;
+      margin-top: -4px;
+    }
+
+    .pricing-btn-buy:hover {
+      border-color: var(--blue);
+      background: rgba(59,130,246,0.04);
+    }
+
     .pricing-trial {
       font-size: 12px;
       color: var(--ink-light);
@@ -704,10 +714,7 @@
       <img src="icon.png" alt="PenSound" class="nav-icon" onerror="this.style.display='none'" />
       <span class="nav-name">PenSound</span>
     </a>
-    <a href="#pricing" class="nav-cta">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Download
-    </a>
+    <a href="https://ffib.lemonsqueezy.com/checkout/buy/f84845af-0b7d-467b-8e5b-e30f11ab6111" target="_blank" rel="noopener" class="nav-cta">Buy — $4.99</a>
   </nav>
 
   <!-- HERO -->
@@ -722,9 +729,7 @@
       <h1 class="hero-title">Every stroke,<br><em>a sound.</em></h1>
       <p class="hero-tagline">The sound of real drawing tools — on any tablet, in any app.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-primary">
-          Download Free Trial
-        </a>
+        <a href="#" class="btn-primary">Download Free Trial</a>
         <a href="#features" class="btn-secondary">Learn more</a>
       </div>
       <p class="hero-meta">macOS 14 Sonoma or later &nbsp;·&nbsp; 14-day free trial &nbsp;·&nbsp; One-time purchase &nbsp;·&nbsp; EN &nbsp;KO &nbsp;JA &nbsp;ZH</p>
@@ -908,7 +913,8 @@
             14-day free trial, no sign-up needed
           </li>
         </ul>
-        <a href="#" class="pricing-btn">Download &amp; Try Free for 14 Days</a>
+        <a href="#" class="pricing-btn">Download Free Trial</a>
+        <a href="https://ffib.lemonsqueezy.com/checkout/buy/f84845af-0b7d-467b-8e5b-e30f11ab6111" target="_blank" rel="noopener" class="pricing-btn pricing-btn-buy">Buy — $4.99</a>
         <p class="pricing-trial">No sign-up needed. Purchase only after you love it.</p>
       </div>
     </div>
