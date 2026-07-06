@@ -27,9 +27,6 @@
   <style>
     .frame { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
 
-    /* 02 팔레트 설명이 뷰포트 중앙에 자석처럼 붙도록 (스크롤 스냅) */
-    html { scroll-snap-type: y proximity; }
-
     /* ── 네비 ── */
     header { border-bottom: var(--line) solid var(--border); position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); z-index: 20; }
     .nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; padding-bottom: 14px; }
@@ -77,6 +74,18 @@
       font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: rgba(0,0,0,0.4);
       pointer-events: none; transition: opacity 300ms ease-out;
     }
+    /* 지우기 버튼 — 잉크가 있을 때만 나타남 */
+    .paper-clear {
+      position: absolute; top: 9px; right: 9px; z-index: 3;
+      appearance: none; cursor: pointer;
+      border: var(--line) solid var(--border); background: var(--bg); color: var(--fg);
+      font-family: var(--font-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 5px 10px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 180ms linear, background 150ms linear, color 150ms linear;
+    }
+    .paper-screen.has-ink .paper-clear { opacity: 1; pointer-events: auto; }
+    .paper-clear:hover { background: var(--fg); color: var(--bg); }
     /* 도구 선택 — 세그먼트 컨트롤 (lang-toggle와 같은 언어) */
     .demo-tools { margin-top: 14px; display: flex; justify-content: center; }
     .demo-toolset { display: inline-flex; border: var(--line) solid var(--border); }
@@ -127,7 +136,14 @@
     .palette-desc p { font-size: 14.5px; font-weight: 500; line-height: 1.7; color: rgba(0,0,0,0.65); margin-bottom: 12px; }
     /* 차별 기능 강조 블록 (홀드 뮤트 / 필압 감도·커브) */
     .feats { margin-top: 22px; }
-    .feat { padding: 14px 0; min-height: 40vh; display: flex; flex-direction: column; justify-content: center; scroll-snap-align: center; scroll-snap-stop: always; }
+    .feat { position: relative; padding: 14px 0 14px 24px; min-height: 40vh; display: flex; flex-direction: column; justify-content: center; }
+    /* 활성 설명 옆에서 자라나는 강조 바 (스크롤에 반응) */
+    .feat::before {
+      content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 0; background: var(--accent); opacity: 0;
+      transition: height 320ms cubic-bezier(0.4,0,0.2,1), opacity 320ms linear;
+    }
+    .feat.is-active::before { height: 52px; opacity: 1; }
     .feat b {
       display: block;
       font-size: 15.5px; font-weight: 800; letter-spacing: -0.01em;
@@ -173,7 +189,7 @@
     .mock-tool.sel { background: rgba(37,99,235,0.13); color: #2563EB; }
     .mock-sec { font-size: 9.5px; font-weight: 600; color: rgba(0,0,0,0.45); padding: 8px 4px 6px; }
 
-    /* ── 03 설명 ↔ 목업 연동 (호버=데스크톱 / 스크롤=모바일) ── */
+    /* ── 03 설명 ↔ 목업 연동 (스크롤에 따라 고정 목업이 반응) ── */
     .mock { position: relative; }                 /* hush-cue 앵커 */
     .mock-stage { position: sticky; top: calc(50vh - 165px); align-self: start; }
     .feat { transition: opacity 200ms linear; }
@@ -185,7 +201,7 @@
 
     /* 하이라이트 대상 */
     [data-region] { outline: 2px solid transparent; outline-offset: 4px; border-radius: 4px;
-                    transition: outline-color 200ms linear, background 200ms linear; }
+                    transition: outline-color 280ms cubic-bezier(0.4,0,0.2,1), background 280ms cubic-bezier(0.4,0,0.2,1); }
     .mock.focus-tools [data-region="tools"],
     .mock.focus-curve [data-region="curve"] { outline-color: var(--accent); background: rgba(37,99,235,0.06); }
     .mock .card-vol { transition: opacity 200ms linear; }
@@ -274,6 +290,7 @@
           <div class="paper-screen">
             <canvas id="demoCanvas" aria-label="Sound demo canvas"></canvas>
             <div class="placeholder" id="demoPlaceholder" data-i18n="demoPlaceholder"></div>
+            <button class="paper-clear" id="demoClear" type="button" data-i18n="clearLabel"></button>
           </div>
           <div class="demo-tools">
            <div class="demo-toolset" role="group" aria-label="Demo tool">
@@ -440,7 +457,7 @@
         heroCta: "무료로 시작하기",
         sketchHint: "여기에 그려보세요!",
         demoPlaceholder: "여기를 드래그해 보세요",
-        toolPen: "펜", toolCrayon: "크레용",
+        toolPen: "펜", toolCrayon: "크레용", clearLabel: "지우기",
         secHow: "01 — 왜 소리일까",
         howTitle: "종이를 떠나며, 우리는 소리를 잃었어요",
         howSpeedT: "낙서가 다시 재밌어져요",
@@ -483,7 +500,7 @@
         heroCta: "Start free",
         sketchHint: "Try drawing here!",
         demoPlaceholder: "Drag to make sound",
-        toolPen: "Pen", toolCrayon: "Crayon",
+        toolPen: "Pen", toolCrayon: "Crayon", clearLabel: "Clear",
         secHow: "01 — Why sound",
         howTitle: "When we left paper, we lost the sound",
         howSpeedT: "Doodling gets fun again",
@@ -552,6 +569,8 @@
     (function () {
       const canvas = document.getElementById("demoCanvas");
       const placeholder = document.getElementById("demoPlaceholder");
+      const screen = document.querySelector(".paper-screen");
+      const clearBtn = document.getElementById("demoClear");
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       let ctx2d = null, W = 0, H = 0;
 
@@ -661,6 +680,7 @@
         ctx2d.moveTo(from.x, from.y);
         ctx2d.lineTo(to.x, to.y);
         ctx2d.stroke();
+        screen.classList.add("has-ink");   // 잉크가 생기면 지우기 버튼 표시
       }
 
       function pt(e) {
@@ -707,6 +727,13 @@
       canvas.addEventListener("pointerup", end);
       canvas.addEventListener("pointercancel", end);
       canvas.addEventListener("pointerleave", end);
+
+      clearBtn.addEventListener("click", function () {
+        end();
+        ctx2d.clearRect(0, 0, W, H);
+        screen.classList.remove("has-ink");
+        placeholder.style.opacity = "1";
+      });
 
       // 무소식 감쇠 (이벤트가 안 오면 속도 하강 — 앱과 같은 원리)
       setInterval(() => {
