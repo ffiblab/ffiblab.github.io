@@ -1,0 +1,149 @@
+/* ═══════════════════════════════════════════════════════════════
+   ffiblab 공유 디자인 토큰 — Swiss International 골격
+   브랜드 페이지와 제품 페이지가 이 파일을 공유한다.
+   시그널 색은 단 하나(브랜드 블루) — 장식이 아니라 기능(CTA·라벨·강조)에만.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 색 — 엄격한 팔레트 */
+  --bg:        #FFFFFF;
+  --fg:        #000000;
+  --muted:     #F2F2F2;
+  --accent:    #2563EB;  /* 브랜드 블루 (텍스트·라벨용, 흰 바탕 대비 5.2:1 AA) */
+  --accent-bright: #3B82F6;  /* 큰 면적 채움 전용 (텍스트 대비 부족 — 소형 텍스트 금지) */
+  --border:    #000000;
+
+  /* 타이포 */
+  --font-sans: "Inter", "Pretendard Variable", Pretendard,
+               -apple-system, "Apple SD Gothic Neo", sans-serif;
+
+  /* 간격 리듬 */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 48px;
+  --space-5: 96px;
+  --space-6: 160px;
+
+  /* 보더 두께 — 구조는 보인다 */
+  --line: 2px;
+  --line-thick: 4px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ── 텍스처 (평면성 유지한 깊이 — 그림자 금지) ── */
+
+/* 종이 노이즈: body 전역, 1.5% — 순백의 차가움에 온기 */
+.tx-noise {
+  position: relative;
+}
+.tx-noise::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 24px 그리드 — 히어로·뮤트 배경에 */
+.tx-grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 16px 도트 매트릭스 */
+.tx-dots {
+  background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* ── 공통 타이포 유틸 ── */
+
+/* 섹션 번호 라벨: "01 — PRODUCTS" */
+.sec-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* 거대 헤드라인 — 글자가 이미지다 */
+.display {
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+/* ── 공통 컴포넌트 ── */
+
+/* 버튼: 직각, 반전 호버 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 28px;
+  border: var(--line) solid var(--border);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 150ms linear, color 150ms linear, border-color 150ms linear;
+}
+.btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn--ghost { background: var(--bg); color: var(--fg); }
+.btn--ghost:hover { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+
+/* 언어 토글 */
+.lang-toggle {
+  display: inline-flex;
+  border: var(--line) solid var(--border);
+}
+.lang-toggle button {
+  appearance: none;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 8px 14px;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 36px;
+  transition: background 150ms linear, color 150ms linear;
+}
+.lang-toggle button + button { border-left: var(--line) solid var(--border); }
+.lang-toggle button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.lang-toggle button:hover:not([aria-pressed="true"]) { background: var(--muted); }
+.lang-toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PenSound — 모든 획에, 소리를.</title>
+  <meta name="description" content="디지털 타블렛에 진짜 필기 소리를 되살리는 macOS 앱. 속도·필압·종이결에 반응하는 실시간 합성. Every stroke, a sound." />
+  <link rel="icon" href="../assets/pensound-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ffiblab.com/pensound/" />
+  <meta property="og:title" content="PenSound — 모든 획에, 소리를." />
+  <meta property="og:description" content="타블렛에서 사라진 펜 소리를 되살리는 macOS 앱. 속도·필압·종이결에 반응하는 실시간 합성. Every stroke, a sound." />
+  <meta property="og:image" content="https://ffiblab.com/assets/og-pensound.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@ffiblab" />
+  <meta name="twitter:title" content="PenSound — 모든 획에, 소리를." />
+  <meta name="twitter:description" content="타블렛에서 사라진 펜 소리를 되살리는 macOS 앱. Every stroke, a sound." />
+  <meta name="twitter:image" content="https://ffiblab.com/assets/og-pensound.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Kalam:wght@400;700&family=Gaegu:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="../assets/tokens.css" />
+  <style>
+    .frame { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
+
+    /* 02 팔레트 설명이 뷰포트 중앙에 자석처럼 붙도록 (스크롤 스냅) */
+    html { scroll-snap-type: y proximity; }
+
+    /* ── 네비 ── */
+    header { border-bottom: var(--line) solid var(--border); position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); z-index: 20; }
+    .nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; padding-bottom: 14px; }
+    .nav-mark { font-size: 15px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg); text-decoration: none; }
+    .nav-mark span { color: var(--accent); }
+    .nav-home { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: rgba(0,0,0,0.45); text-decoration: none; text-transform: uppercase; }
+    .nav-home:hover { color: var(--accent); }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+    .nav .btn { min-height: 38px; padding: 0 18px; font-size: 12px; }
+
+    /* ── 히어로: 비대칭 5:7 ── */
+    .hero { padding-top: clamp(40px, 7vh, 88px); padding-bottom: clamp(48px, 8vh, 104px); }
+    .hero-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(24px, 4vw, 64px); align-items: center; }
+    @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+    .hero h1 { font-size: clamp(44px, 6.5vw, 84px); text-transform: none; }
+    .hero h1 .dot { color: var(--accent); }
+    .hero .lede { margin-top: var(--space-3); font-size: clamp(15px, 1.6vw, 18px); font-weight: 500; line-height: 1.6; color: rgba(0,0,0,0.65); max-width: 420px; }
+    .hero .cta-row { margin-top: var(--space-4); display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* 스케치 포인트: 손글씨 힌트 + 손그림 화살표 (그림 앱의 정체성 — 여기서만) */
+    .sketch-hint { position: relative; margin-top: var(--space-4); height: 44px; display: none; }
+    @media (min-width: 900px) { .sketch-hint { display: block; } }
+    /* EN=Kalam / KO=Gaegu (한글 손글씨 — 순정 산세리프가 손그림 화살표와 안 어울려서) */
+    .sketch-hint .hand { font-family: "Kalam", "Gaegu", cursive; font-size: 18px; color: #2d2d2d; transform: rotate(-2.5deg); display: inline-block; }
+    html[lang="ko"] .sketch-hint .hand { font-size: 21px; }
+    .sketch-hint svg { position: absolute; left: 150px; top: -14px; overflow: visible; }
+
+    /* ── 소리 데모 패널: 종이 은유, 스위스-플랫 (그림자 없음) ── */
+    .demo-panel {
+      background: var(--muted);
+      border: var(--line) solid var(--border);
+      padding: 16px;
+    }
+    /* 그리기 영역 = 종이 시트 (밝은 바탕 + 어두운 잉크 — 페이지의 '종이' 서사와 연결) */
+    .paper-screen {
+      background: var(--bg);
+      border: var(--line) solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .paper-screen canvas { display: block; width: 100%; height: 300px; touch-action: none; cursor: crosshair; }
+    .paper-screen .placeholder {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: rgba(0,0,0,0.4);
+      pointer-events: none; transition: opacity 300ms ease-out;
+    }
+    /* 도구 선택 — 세그먼트 컨트롤 (lang-toggle와 같은 언어) */
+    .demo-tools { margin-top: 14px; display: flex; justify-content: center; }
+    .demo-toolset { display: inline-flex; border: var(--line) solid var(--border); }
+    .demo-tool {
+      appearance: none; border: 0; cursor: pointer;
+      display: flex; align-items: center; gap: 7px;
+      background: var(--bg); color: var(--fg);
+      font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 9px 18px;
+      transition: background 150ms linear, color 150ms linear;
+    }
+    .demo-tool + .demo-tool { border-left: var(--line) solid var(--border); }
+    .demo-tool:hover:not([aria-pressed="true"]) { background: var(--muted); }
+    .demo-tool[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+    .demo-tool:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .demo-tool .glyph { width: 19px; height: 19px; }
+    .demo-note {
+      margin-top: 12px; text-align: center;
+      font-size: 11px; font-weight: 500; color: rgba(0,0,0,0.5);
+    }
+
+    /* ── 섹션 공통 ── */
+    section { border-top: var(--line) solid var(--border); padding-top: var(--space-4); padding-bottom: var(--space-5); }
+    .sec-head { margin-bottom: var(--space-4); display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; }
+    .sec-head h2 { font-size: clamp(24px, 3.4vw, 40px); font-weight: 900; letter-spacing: -0.02em; }
+
+    /* ── 02 작동 원리: 3열 카드 ── */
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+    @media (max-width: 820px) { .how-grid { grid-template-columns: 1fr; } }
+    .how-card {
+      border: var(--line) solid var(--border);
+      background: var(--muted);
+      padding: var(--space-3);
+      min-height: 200px;
+      display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+      transition: background 150ms linear, color 150ms linear;
+    }
+    .how-card:hover { background: var(--fg); color: #fff; }
+    .how-card:hover .how-num { color: #fff; }
+    .how-card .how-num { font-size: 12px; font-weight: 700; letter-spacing: 0.18em; color: var(--accent); transition: color 150ms linear; }
+    .how-card h3 { font-size: 20px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 8px; }
+    .how-card p { font-size: 13.5px; font-weight: 500; line-height: 1.6; opacity: 0.75; }
+
+    /* ── 03 팔레트 목업 (스크린샷 대신 코드로 — 항상 crisp, 언어 연동) ── */
+    .palette-grid { display: grid; grid-template-columns: 7fr 5fr; gap: clamp(24px, 4vw, 64px); align-items: start; }
+    @media (max-width: 900px) { .palette-grid { grid-template-columns: 1fr; } }
+    .palette-desc h3 { font-size: clamp(20px, 2.6vw, 28px); font-weight: 900; letter-spacing: -0.01em; margin-bottom: 14px; }
+    .palette-desc p { font-size: 14.5px; font-weight: 500; line-height: 1.7; color: rgba(0,0,0,0.65); margin-bottom: 12px; }
+    /* 차별 기능 강조 블록 (홀드 뮤트 / 필압 감도·커브) */
+    .feats { margin-top: 22px; }
+    .feat { padding: 14px 0; min-height: 40vh; display: flex; flex-direction: column; justify-content: center; scroll-snap-align: center; scroll-snap-stop: always; }
+    .feat b {
+      display: block;
+      font-size: 15.5px; font-weight: 800; letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+    .feat b::before { content: "→ "; color: var(--accent); font-weight: 900; }
+    .feat span { font-size: 13.5px; font-weight: 500; line-height: 1.65; color: rgba(0,0,0,0.6); }
+
+    .mock-stage { background: var(--muted); border: var(--line) solid var(--border); padding: clamp(24px, 4vw, 56px); display: flex; justify-content: center; }
+    .mock {
+      width: 290px; background: #F4F4F6; border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+      font-family: var(--font-sans);
+      padding: 8px 10px 10px;
+      color: #1d1d1f;
+    }
+    .mock-head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px; }
+    .mock-dot { width: 8px; height: 8px; border-radius: 50%; background: #34C759; }
+    .mock-head .sp { flex: 1; }
+    .mock-head svg { width: 13px; height: 13px; color: rgba(0,0,0,0.42); }
+    .mock-card { background: rgba(255,255,255,0.72); border-radius: 9px; padding: 10px; }
+    .mock-card + .mock-card { margin-top: 8px; }
+    .mock-cap {
+      height: 22px; border-radius: 11px; background: rgba(0,0,0,0.10);
+      box-shadow: inset 0 0.5px 1.5px rgba(0,0,0,0.08);
+      position: relative; overflow: hidden;
+    }
+    .mock-cap + .mock-cap { margin-top: 8px; }
+    .mock-cap .fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: #fff; border-radius: 11px;
+      /* 선명한 윤곽선 + 약한 그림자 — 흰 배경 위 흰 게이지의 구분감 */
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.22), 0 0.5px 1px rgba(0,0,0,0.08);
+      width: 55%;
+      transition: width 900ms ease-in-out;
+    }
+    .mock-cap svg { position: absolute; left: 8px; top: 4px; width: 14px; height: 14px; opacity: 0.55; }
+    .mock-cap .val { position: absolute; right: 9px; top: 4.5px; font-size: 9px; color: rgba(0,0,0,0.5); font-variant-numeric: tabular-nums; }
+    .mock-tools { display: flex; justify-content: space-between; padding: 6px 4px; }
+    .mock-tool { width: 40px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #3a4046; transition: background 300ms, color 300ms; }
+    .mock-tool svg { width: 17px; height: 17px; }
+    .mock-tool.sel { background: rgba(37,99,235,0.13); color: #2563EB; }
+    .mock-sec { font-size: 9.5px; font-weight: 600; color: rgba(0,0,0,0.45); padding: 8px 4px 6px; }
+
+    /* ── 03 설명 ↔ 목업 연동 (호버=데스크톱 / 스크롤=모바일) ── */
+    .mock { position: relative; }                 /* hush-cue 앵커 */
+    .mock-stage { position: sticky; top: calc(50vh - 165px); align-self: start; }
+    .feat { transition: opacity 200ms linear; }
+    .feat[data-feat] { outline: none; }
+    .feat b { transition: color 150ms linear; }
+    .feats.has-active .feat:not(.is-active) { opacity: 0.42; }
+    .feat.is-active b::before { color: var(--accent); }
+    .feat[data-feat]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+    /* 하이라이트 대상 */
+    [data-region] { outline: 2px solid transparent; outline-offset: 4px; border-radius: 4px;
+                    transition: outline-color 200ms linear, background 200ms linear; }
+    .mock.focus-tools [data-region="tools"],
+    .mock.focus-curve [data-region="curve"] { outline-color: var(--accent); background: rgba(37,99,235,0.06); }
+    .mock .card-vol { transition: opacity 200ms linear; }
+    .mock.is-focusing .card-vol { opacity: 0.4; }
+
+    /* 홀드 뮤트 큐 — 목업 위에 'Space 누르면 조용히' */
+    .hush-cue {
+      position: absolute; inset: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      background: rgba(244,244,246,0.82);
+      opacity: 0; pointer-events: none; transition: opacity 200ms linear;
+    }
+    .mock.focus-mute .hush-cue { opacity: 1; }
+    .hush-cue svg { width: 20px; height: 20px; color: var(--fg); }
+    .hush-cue kbd {
+      font-family: var(--font-sans); font-size: 12px; font-weight: 700;
+      border: var(--line) solid var(--border); background: var(--bg); color: var(--fg);
+      padding: 5px 11px; line-height: 1;
+    }
+    .hush-cue span { font-size: 12px; font-weight: 600; color: rgba(0,0,0,0.7); }
+
+    /* ── 04 다운로드 ── */
+    .dl-wrap { display: grid; grid-template-columns: 1fr auto; gap: var(--space-4); align-items: center; }
+    @media (max-width: 820px) { .dl-wrap { grid-template-columns: 1fr; } }
+    .dl-title { font-size: clamp(32px, 5vw, 64px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.02; }
+    .dl-title .dot { color: var(--accent); }
+    .dl-meta { margin-top: 18px; font-size: 13px; font-weight: 500; color: rgba(0,0,0,0.55); line-height: 1.8; }
+    .dl-cta { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+    .dl-cta .btn { min-height: 64px; font-size: 16px; padding: 0 44px; text-transform: none; letter-spacing: 0.04em; }
+    .dl-cta .win { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+    /* 가격: 얼리 액세스 특가 + 정가(취소선) */
+    .price { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding-bottom: 4px; }
+    .price-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+    .price-row { display: flex; align-items: baseline; gap: 12px; }
+    .price-now { font-size: 36px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+    .price-was { font-size: 13px; font-weight: 500; color: rgba(0,0,0,0.42); }
+    .price-was em { font-style: normal; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10.5px; font-weight: 700; }
+    .price-was s { font-variant-numeric: tabular-nums; }
+    .price-note { font-size: 12px; font-weight: 600; color: rgba(0,0,0,0.6); }
+    .price-after { font-size: 11px; font-weight: 600; color: var(--accent); }
+
+    /* ── 푸터 ── */
+    footer { border-top: var(--line) solid var(--border); font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.5); }
+    .foot-inner { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); padding-bottom: var(--space-4); flex-wrap: wrap; gap: 12px; }
+    footer nav { display: flex; gap: 20px; }
+    footer a { color: rgba(0,0,0,0.5); text-decoration: none; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body class="tx-noise">
+  <header>
+    <div class="frame nav">
+      <a class="nav-mark" href="./">PenSound<span>.</span></a>
+      <a class="nav-home" href="../">ffiblab</a>
+      <div class="nav-right">
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" data-lang="ko" aria-pressed="true">KO</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn" href="#download" data-i18n="navDownload"></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ══ 히어로: 타이포 + 소리 데모 ══ -->
+    <div class="hero tx-grid">
+      <div class="frame hero-grid">
+        <div>
+          <h1 class="display" data-i18n-html="heroTitle"></h1>
+          <p class="lede" data-i18n="heroLede"></p>
+          <div class="cta-row">
+            <a class="btn" href="#download" data-i18n="heroCta"></a>
+          </div>
+          <div class="sketch-hint">
+            <span class="hand" data-i18n="sketchHint"></span>
+            <svg width="150" height="60" viewBox="0 0 150 60" aria-hidden="true">
+              <path d="M4,52 C50,50 96,40 134,20" fill="none" stroke="#2d2d2d" stroke-width="1.8" stroke-dasharray="5,5" stroke-linecap="round"/>
+              <!-- 화살촉: 오른쪽 위 종이 패널을 향해 (≈27° 우상향) -->
+              <path d="M120,22 L134,20 L125,30" fill="none" stroke="#2d2d2d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="demo-panel">
+          <div class="paper-screen">
+            <canvas id="demoCanvas" aria-label="Sound demo canvas"></canvas>
+            <div class="placeholder" id="demoPlaceholder" data-i18n="demoPlaceholder"></div>
+          </div>
+          <div class="demo-tools">
+           <div class="demo-toolset" role="group" aria-label="Demo tool">
+            <button class="demo-tool" type="button" data-tool="pen" aria-pressed="true">
+              <svg class="glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(45 12 12)"><path d="M10 2 h4 l-1 10 h-2 z"/><path d="M11 12 v3 h2 v-3"/><path d="M11 15 l1 6 l1 -6"/><path d="M12 15 v3"/><path d="M14 4 c 1 0 1.5 0.5 1.5 1 v4 c 0 0.5 -0.5 1 -1.5 1"/></g></svg>
+              <span data-i18n="toolPen"></span>
+            </button>
+            <button class="demo-tool" type="button" data-tool="crayon" aria-pressed="false">
+              <svg class="glyph" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(45 12 12)"><path d="M8 4 h8 v13 l-2 4 h-4 l-2 -4 z"/><path d="M8 8 h8"/><path d="M8 14 h8"/><path d="M8 11 q 2 -2 4 0 t 4 0"/></g></svg>
+              <span data-i18n="toolCrayon"></span>
+            </button>
+           </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 02 작동 원리 ══ -->
+    <section id="how">
+      <div class="frame">
+        <div class="sec-head">
+          <span class="sec-label" data-i18n="secHow"></span>
+          <h2 data-i18n="howTitle"></h2>
+        </div>
+        <div class="how-grid">
+          <div class="how-card tx-dots">
+            <span class="how-num">FUN</span>
+            <div>
+              <h3 data-i18n="howSpeedT"></h3>
+              <p data-i18n="howSpeedP"></p>
+            </div>
+          </div>
+          <div class="how-card tx-dots">
+            <span class="how-num">FOCUS</span>
+            <div>
+              <h3 data-i18n="howPressT"></h3>
+              <p data-i18n="howPressP"></p>
+            </div>
+          </div>
+          <div class="how-card tx-dots">
+            <span class="how-num">REAL</span>
+            <div>
+              <h3 data-i18n="howGrainT"></h3>
+              <p data-i18n="howGrainP"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 03 팔레트 (라이브 목업) ══ -->
+    <section id="palette">
+      <div class="frame">
+        <div class="sec-head">
+          <span class="sec-label" data-i18n="secPalette"></span>
+          <h2 data-i18n="paletteTitle"></h2>
+        </div>
+        <div class="palette-grid">
+          <div class="mock-stage tx-grid">
+            <div class="mock" aria-hidden="true">
+              <div class="hush-cue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4H4z" fill="currentColor" stroke="none"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
+                <kbd>Space</kbd>
+                <span data-i18n="hushCue"></span>
+              </div>
+              <div class="mock-head">
+                <div class="mock-dot"></div>
+                <div class="sp"></div>
+                <!-- 실제 앱 헤더의 컴팩트 전환·설정 버튼 재현 -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9l5-5 5 5M7 15l5 5 5-5"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>
+              </div>
+              <div class="mock-card card-vol">
+                <div class="mock-cap"><div class="fill" id="mockVol" style="width:55%"></div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"><path d="M4 10v4h4l5 4V6l-5 4H4z" fill="#333" stroke="none"/><path d="M16.5 9.5a4 4 0 0 1 0 5"/></svg>
+                  <span class="val">55%</span>
+                </div>
+                <div class="mock-cap"><div class="fill" id="mockTap" style="width:50%"></div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v8.1M9.2 10.2L12 13.4l2.8-3.2"/><path d="M8.05 16.06a4.2 4.2 0 0 0 7.9 0M5.99 17.99a6.4 6.4 0 0 0 12.02 0"/></svg>
+                  <span class="val">50%</span>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-tools" id="mockTools" data-region="tools">
+                  <div class="mock-tool sel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M15 16 v-8 a3 3 0 0 0 -6 0 v8 l3 5 l3 -5 z"/><path d="M9 16 q 1.5 -1.5 3 0 q 1.5 -1.5 3 0"/><path d="M9 10 l6 2"/><path d="M9 13 l6 2"/></g></svg></div>
+                  <div class="mock-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M10 2 h4 l-1 10 h-2 z"/><path d="M11 12 v3 h2 v-3"/><path d="M11 15 l1 6 l1 -6"/><path d="M12 15 v3"/><path d="M14 4 c 1 0 1.5 0.5 1.5 1 v4 c 0 0.5 -0.5 1 -1.5 1"/></g></svg></div>
+                  <div class="mock-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M8 4 h8 v13 l-2 4 h-4 l-2 -4 z"/><path d="M8 8 h8"/><path d="M8 14 h8"/><path d="M8 11 q 2 -2 4 0 t 4 0"/></g></svg></div>
+                  <div class="mock-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M7 2 h10 v12 h-10 z"/><path d="M7 8 h10"/><path d="M8 14 h8 v2 h-8 z"/><path d="M9 16 v5 l5 -2 v-3"/></g></svg></div>
+                </div>
+                <div class="curve-region" data-region="curve">
+                  <div class="mock-sec" data-i18n="mockToolSettings"></div>
+                  <div class="mock-cap"><div class="fill" id="mockPress" style="width:50%"></div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v8.1M9.2 10.2L12 13.4l2.8-3.2M4.5 17.5h15"/></svg>
+                    <span class="val" data-i18n="mockStandard"></span>
+                  </div>
+                  <div class="mock-cap"><div class="fill" style="left:50%; width:12%; border-radius:4px; transform:translateX(-50%);"></div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round"><path d="M3 12c1.8-6.4 4.4-6.4 6.2 0 1.4 4.8 3.2 4.8 4.6 0 1.1-3.6 2.3-3.6 3.4 0 .8 2.6 1.7 2.6 2.5 0"/></svg>
+                    <span class="val">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="palette-desc">
+            <h3 data-i18n="paletteH"></h3>
+            <p data-i18n="paletteP"></p>
+            <div class="feats">
+              <div class="feat" data-feat="mute" tabindex="0"><b data-i18n="featMuteT"></b><span data-i18n="featMuteP"></span></div>
+              <div class="feat" data-feat="curve" tabindex="0"><b data-i18n="featCurveT"></b><span data-i18n="featCurveP"></span></div>
+              <div class="feat" data-feat="tools" tabindex="0"><b data-i18n="featToolsT"></b><span data-i18n="featToolsP"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 04 다운로드 ══ -->
+    <section id="download">
+      <div class="frame">
+        <div class="sec-head">
+          <span class="sec-label" data-i18n="secDownload"></span>
+        </div>
+        <div class="dl-wrap">
+          <div>
+            <h2 class="dl-title" data-i18n-html="dlTitle"></h2>
+            <p class="dl-meta" data-i18n-html="dlMeta"></p>
+          </div>
+          <div class="dl-cta">
+            <div class="price">
+              <span class="price-tag" data-i18n="priceTag"></span>
+              <div class="price-row">
+                <span class="price-now" data-i18n="priceEarly"></span>
+                <span class="price-was"><em data-i18n="priceRegLabel"></em> <s data-i18n="priceReg"></s></span>
+              </div>
+              <span class="price-note" data-i18n="priceNote"></span>
+              <span class="price-after" data-i18n="priceAfter"></span>
+            </div>
+            <a class="btn" href="https://ffiblab.github.io/pensound-releases/PenSound.dmg" data-i18n="dlCta"></a>
+            <span class="win" data-i18n="dlWin"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="frame foot-inner">
+      <span>© 2026 <a href="../" style="font-size:12px; text-transform:none; letter-spacing:0;">ffiblab</a></span>
+      <nav>
+        <a href="../privacy/" data-i18n="privacy"></a>
+        <a href="../refund/" data-i18n="refund"></a>
+        <a href="mailto:hello@ffiblab.com" data-i18n="contact"></a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    /* ══════════ i18n ══════════ */
+    const STRINGS = {
+      ko: {
+        navDownload: "다운로드",
+        heroTitle: "모든 획에,<br />소리를<span class='dot'>.</span>",
+        heroLede: "타블렛으로 넘어오며 사라진 펜 소리를 되살려요. 속도·필압·종이결을 따라가며 매 순간 새로 만들어내는 소리예요.",
+        heroCta: "무료로 시작하기",
+        sketchHint: "여기에 그려보세요!",
+        demoPlaceholder: "여기를 드래그해 보세요",
+        toolPen: "펜", toolCrayon: "크레용",
+        secHow: "01 — 왜 소리일까",
+        howTitle: "종이를 떠나며, 우리는 소리를 잃었어요",
+        howSpeedT: "낙서가 다시 재밌어져요",
+        howSpeedP: "사각사각 손맛이 돌아오면, 의미 없는 선 하나에도 긋는 맛이 생겨요. 한동안 닫혀 있던 스케치북이 다시 열려요.",
+        howPressT: "소리가 몰입을 데려와요",
+        howPressP: "펜 소리는 가장 오래된 집중 사운드예요. 빗소리·백색소음처럼 잡생각을 덮고, 주의를 손끝으로 모아줘요.",
+        howGrainT: "그래서, 진짜여야 해요",
+        howGrainP: "반복 재생되는 녹음은 귀가 금방 눈치채요. PenSound는 속도·필압·종이결까지 따라가는 실시간 합성이라, 아무리 오래 들어도 질리지 않아요.",
+        secPalette: "02 — 팔레트",
+        paletteTitle: "메뉴바에 사는 작은 도구",
+        paletteH: "그리는 동안, 조용히 구석에",
+        paletteP: "메뉴바에서 팔레트를 열어 도구와 볼륨, 필압 반응을 바로 조절해요.",
+        featMuteT: "꾹 누르면 잠깐 조용히 — 홀드 뮤트",
+        featMuteP: "정해둔 키를 누르고 있는 동안만 소리가 멈춰요. 통화 중에도, 회의 중에도 그림은 계속.",
+        featCurveT: "내 손에 맞는 필압 — 감도와 커브",
+        featCurveP: "프리셋으로 빠르게 고르고, 베지어 커브로 세밀하게 다듬어요. 도구마다 따로 기억해 둬요.",
+        featToolsT: "네 가지 도구",
+        featToolsP: "연필·만년필·크레용·마커. 원하는 앱에서만 켜지게 할 수도 있어요.",
+        mockToolSettings: "도구 설정 — 연필",
+        mockStandard: "표준",
+        hushCue: "누르는 동안만 조용히",
+        secDownload: "03 — 다운로드",
+        // ⬇︎ 가격 — priceEarly(얼리) / priceReg(정가)
+        priceTag: "얼리 액세스 특가",
+        priceEarly: "₩7,900",
+        priceRegLabel: "정가",
+        priceReg: "₩13,900",
+        priceNote: "한 번 구매 · 구독 없음 · 평생 업데이트",
+        priceAfter: "정식 출시 후 정가로 인상돼요",
+        dlTitle: "14일 동안,<br />무료로 들어보세요<span class='dot'>.</span>",
+        dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔 모두 지원해요<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
+        dlCta: "macOS용 다운로드",
+        dlWin: "Windows — 준비 중",
+        privacy: "개인정보 처리방침", refund: "환불 정책", contact: "문의",
+      },
+      en: {
+        navDownload: "Download",
+        heroTitle: "Every stroke,<br />a sound<span class='dot'>.</span>",
+        heroLede: "Bring back the pen sounds your tablet took away — made new with every stroke, following your speed, pressure, and paper grain.",
+        heroCta: "Start free",
+        sketchHint: "Try drawing here!",
+        demoPlaceholder: "Drag to make sound",
+        toolPen: "Pen", toolCrayon: "Crayon",
+        secHow: "01 — Why sound",
+        howTitle: "When we left paper, we lost the sound",
+        howSpeedT: "Doodling gets fun again",
+        howSpeedP: "When the scratch of the pen comes back, even a meaningless line feels worth drawing. Cold sketchbooks warm up again.",
+        howPressT: "Sound that pulls you in",
+        howPressP: "Pen sound is the oldest focus noise there is. Like rain or white noise, it masks the chatter and gathers your attention at your fingertips.",
+        howGrainT: "That's why it must be real",
+        howGrainP: "Ears catch looped recordings fast. PenSound synthesizes in real time — tracking speed, pressure, even paper grain — so it never wears thin.",
+        secPalette: "02 — The Palette",
+        paletteTitle: "A small tool that lives in your menu bar",
+        paletteH: "Quietly in the corner while you draw",
+        paletteP: "Open the palette from the menu bar to adjust tools, volume, and pressure response on the spot.",
+        featMuteT: "Hold to hush — hold-to-mute",
+        featMuteP: "Sound pauses only while you hold the key. Keep sketching through calls and meetings.",
+        featCurveT: "Pressure that fits your hand",
+        featCurveP: "Pick a preset, then fine-tune with a full Bézier curve editor — remembered per tool.",
+        featToolsT: "Four tools",
+        featToolsP: "Pencil, fountain pen, crayon, marker — and it can stay active only in the apps you choose.",
+        mockToolSettings: "Tool Settings — Pencil",
+        mockStandard: "Standard",
+        hushCue: "Quiet while held",
+        secDownload: "03 — Download",
+        // ⬇︎ price — priceEarly / priceReg
+        priceTag: "Early access",
+        priceEarly: "$5.99",
+        priceRegLabel: "Reg.",
+        priceReg: "$9.99",
+        priceNote: "One-time purchase · No subscription · Free updates",
+        priceAfter: "Goes up to full price at launch",
+        dlTitle: "Try it free<br />for 14 days<span class='dot'>.</span>",
+        dlMeta: "macOS 13+ · Apple Silicon & Intel<br />One license for both Windows & macOS — up to 2 devices, mix freely",
+        dlCta: "Download for macOS",
+        dlWin: "Windows — coming soon",
+        privacy: "Privacy", refund: "Refund", contact: "Contact",
+      },
+    };
+
+    function setLang(lang) {
+      const dict = STRINGS[lang] || STRINGS.en;
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const v = dict[el.dataset.i18n];
+        if (v != null) el.textContent = v;
+      });
+      document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+        const v = dict[el.dataset.i18nHtml];
+        if (v != null) el.innerHTML = v;
+      });
+      document.querySelectorAll(".lang-toggle button").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+      });
+      try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
+    }
+    document.querySelectorAll(".lang-toggle button").forEach((b) => {
+      b.addEventListener("click", () => setLang(b.dataset.lang));
+    });
+    let initial = null;
+    try { initial = localStorage.getItem("ffiblab-lang"); } catch (e) {}
+    if (!initial) initial = (navigator.language || "en").startsWith("ko") ? "ko" : "en";
+    setLang(initial);
+
+    /* ══════════ 사운드 데모 ══════════
+       실제 합성 엔진(오프라인 하네스)으로 렌더한 3단 속도 루프를
+       드래그 속도에 따라 게인 크로스페이드 — 웹에서 합성하지 않으므로
+       데모 음질 = 앱 음질. 탭은 착지 순간 원샷. */
+    (function () {
+      const canvas = document.getElementById("demoCanvas");
+      const placeholder = document.getElementById("demoPlaceholder");
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let ctx2d = null, W = 0, H = 0;
+
+      function fitCanvas() {
+        const r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx2d = canvas.getContext("2d");
+        ctx2d.scale(dpr, dpr);
+        ctx2d.lineCap = "round";
+        ctx2d.lineJoin = "round";
+      }
+      fitCanvas();
+      window.addEventListener("resize", fitCanvas);
+
+      let ac = null;              // AudioContext (첫 제스처에서 생성 — 자동재생 정책)
+      let currentTool = "pen";
+      const bufferCache = {};     // { tool: {slow,mid,fast,taps:[...]}}
+      let voices = null;          // {slow:{src,gain}, ...}
+      let drawing = false;
+      let lastPt = null, lastT = 0, speedEma = 0;
+
+      // ⚠️ file://로 직접 열면 브라우저가 fetch를 차단해 소리가 안 남 — http(s)로 확인할 것
+      if (location.protocol === "file:") {
+        console.warn("[PenSound demo] file://에서는 오디오 fetch가 차단됩니다. localhost 서버나 배포 주소로 열어주세요.");
+      }
+      async function loadTool(tool) {
+        if (bufferCache[tool]) return bufferCache[tool];
+        try {
+          const names = ["slow", "mid", "fast", "tap1", "tap2", "tap3", "tap4"];
+          const bufs = await Promise.all(names.map(async (n) => {
+            const res = await fetch(`audio/${tool}_${n}.m4a`);
+            const ab = await res.arrayBuffer();
+            return ac.decodeAudioData(ab);
+          }));
+          const entry = { slow: bufs[0], mid: bufs[1], fast: bufs[2], taps: bufs.slice(3) };
+          bufferCache[tool] = entry;
+          return entry;
+        } catch (err) {
+          console.warn("[PenSound demo] 오디오 로드 실패 — 잉크만 동작합니다:", err);
+          return null;
+        }
+      }
+
+      function stopVoices() {
+        if (!voices) return;
+        const t = ac.currentTime;
+        for (const k of ["slow", "mid", "fast"]) {
+          voices[k].gain.gain.setTargetAtTime(0, t, 0.04);
+          voices[k].src.stop(t + 0.4);
+        }
+        voices = null;
+      }
+
+      async function startVoices() {
+        const bufs = await loadTool(currentTool);
+        if (!bufs || !drawing || voices) return;   // 로드 실패/로딩 중 손 뗌 → 시작 안 함
+        voices = {};
+        for (const k of ["slow", "mid", "fast"]) {
+          const src = ac.createBufferSource();
+          src.buffer = bufs[k];
+          src.loop = true;
+          src.loopStart = 0;
+          src.loopEnd = bufs[k].duration;
+          const gain = ac.createGain();
+          gain.gain.value = 0;
+          src.connect(gain).connect(ac.destination);
+          src.start(0, Math.random() * bufs[k].duration);   // 위상 랜덤 — 반복감 방지
+          voices[k] = { src, gain };
+        }
+      }
+
+      function updateGains() {
+        if (!voices) return;
+        // speedEma: 0(정지)~1(고속). 3-레이어 등파워 크로스페이드
+        const s = Math.min(1, speedEma);
+        const wSlow = Math.max(0, 1 - s * 2.2);
+        const wFast = Math.max(0, (s - 0.55) * 2.2);
+        const wMid = Math.max(0, 1 - wSlow - wFast * 0.7);
+        const master = drawing ? Math.min(1.1, 0.3 + s * 0.9) : 0;   // 정규화된 소스(-6dB 피크) 기준
+        const t = ac.currentTime;
+        voices.slow.gain.gain.setTargetAtTime(wSlow * master * 0.9, t, 0.06);
+        voices.mid.gain.gain.setTargetAtTime(wMid * master, t, 0.06);
+        voices.fast.gain.gain.setTargetAtTime(wFast * master * 1.1, t, 0.06);
+      }
+
+      function playTap() {
+        const bufs = bufferCache[currentTool];
+        if (!bufs) return;
+        const src = ac.createBufferSource();
+        src.buffer = bufs.taps[1 + Math.floor(Math.random() * 2)];  // 중간 필압 탭
+        const g = ac.createGain();
+        g.gain.value = 0.9;
+        src.connect(g).connect(ac.destination);
+        src.start();
+      }
+
+      /* 잉크: 속도에 따라 가늘어지는 손그림 선 (스케치 요소를 유저가 직접 그린다) */
+      const INK = { pen: "#1B1F26", crayon: "#C4562F" };   // 밝은 종이 위 어두운 잉크 (도구별)
+      const strokes = [];
+      function ink(from, to, speed) {
+        ctx2d.strokeStyle = INK[currentTool] || "#1B1F26";
+        ctx2d.globalAlpha = 0.9;
+        ctx2d.lineWidth = Math.max(1.2, 4.2 - speed * 3);
+        ctx2d.beginPath();
+        ctx2d.moveTo(from.x, from.y);
+        ctx2d.lineTo(to.x, to.y);
+        ctx2d.stroke();
+      }
+
+      function pt(e) {
+        const r = canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+
+      canvas.addEventListener("pointerdown", async (e) => {
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+        if (ac.state === "suspended") ac.resume();   // await 금지 — 정책상 지연돼도 로딩·잉크는 진행
+        drawing = true;
+        lastPt = pt(e); lastT = performance.now(); speedEma = 0;
+        placeholder.style.opacity = "0";
+        await loadTool(currentTool);
+        playTap();
+        startVoices();
+      });
+
+      canvas.addEventListener("pointermove", (e) => {
+        if (!drawing || !lastPt) return;
+        const p = pt(e);
+        const now = performance.now();
+        const dt = Math.max(1, now - lastT);
+        const dist = Math.hypot(p.x - lastPt.x, p.y - lastPt.y);
+        const v = Math.min(1, (dist / dt) / 1.4);   // px/ms 정규화
+        speedEma += (v - speedEma) * 0.25;
+        ink(lastPt, p, speedEma);
+        lastPt = p; lastT = now;
+        updateGains();
+      });
+
+      function end() {
+        if (!drawing) return;
+        drawing = false;
+        speedEma = 0;
+        if (voices && ac) {
+          const t = ac.currentTime;
+          for (const k of ["slow", "mid", "fast"]) voices[k].gain.gain.setTargetAtTime(0, t, 0.05);
+          const v = voices; voices = null;
+          setTimeout(() => { try { for (const k of ["slow","mid","fast"]) v[k].src.stop(); } catch (e) {} }, 500);
+        }
+      }
+      canvas.addEventListener("pointerup", end);
+      canvas.addEventListener("pointercancel", end);
+      canvas.addEventListener("pointerleave", end);
+
+      // 무소식 감쇠 (이벤트가 안 오면 속도 하강 — 앱과 같은 원리)
+      setInterval(() => {
+        if (drawing && performance.now() - lastT > 90) {
+          speedEma *= 0.75;
+          updateGains();
+        }
+      }, 60);
+
+      // 도구 전환
+      document.querySelectorAll(".demo-tool").forEach((b) => {
+        b.addEventListener("click", async () => {
+          document.querySelectorAll(".demo-tool").forEach((x) => x.setAttribute("aria-pressed", "false"));
+          b.setAttribute("aria-pressed", "true");
+          currentTool = b.dataset.tool;
+          end();
+          if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+          if (ac.state === "suspended") ac.resume();
+          await loadTool(currentTool);
+          playTap();   // 전환 피드백 = 그 도구의 탭 소리
+        });
+      });
+    })();
+
+    /* ══════════ 팔레트: 스크롤 스크롤리텔링 ══════════
+       목업은 스티키로 고정, 각 설명이 뷰포트 중앙선을 지날 때 해당 부분을 활성화.
+       데스크톱·모바일 동일하게 스크롤로 구동. key: mute | curve | tools */
+    (function () {
+      const mock = document.querySelector("#palette .mock");
+      const feats = [...document.querySelectorAll("#palette .feat[data-feat]")];
+      const featsWrap = document.querySelector("#palette .feats");
+      if (!mock || !feats.length) return;
+      const press = document.getElementById("mockPress");
+      const tools = document.querySelectorAll("#mockTools .mock-tool");
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let toolTimer = null, pressTimer = null;
+      function clearTimers() { clearInterval(toolTimer); clearInterval(pressTimer); toolTimer = pressTimer = null; }
+
+      function activate(key) {
+        clearTimers();
+        mock.classList.remove("focus-tools", "focus-curve", "focus-mute", "is-focusing");
+        feats.forEach((f) => f.classList.toggle("is-active", f.dataset.feat === key));
+        featsWrap.classList.toggle("has-active", !!key);
+        if (!key) return;
+        if (key === "tools") {
+          mock.classList.add("focus-tools", "is-focusing");
+          if (!reduce) {
+            let i = 0;
+            const step = () => { tools.forEach((t) => t.classList.remove("sel")); i = (i + 1) % tools.length; tools[i].classList.add("sel"); };
+            step();
+            toolTimer = setInterval(step, 950);
+          }
+        } else if (key === "curve") {
+          mock.classList.add("focus-curve", "is-focusing");
+          if (!reduce) {
+            let hi = true;
+            const step = () => { press.style.width = (hi ? 74 : 32) + "%"; hi = !hi; };
+            step();
+            pressTimer = setInterval(step, 900);
+          }
+        } else if (key === "mute") {
+          mock.classList.add("focus-mute");
+        }
+      }
+
+      // 뷰포트 중앙을 지나는 설명을 활성화 (스크롤 구동 — 데스크톱·모바일 동일)
+      let currentKey = null;
+      function update() {
+        const center = window.innerHeight / 2;
+        let best = null;
+        for (const f of feats) {
+          const r = f.getBoundingClientRect();
+          if (r.top < center && r.bottom > center) { best = f; break; }
+        }
+        if (best && best.dataset.feat !== currentKey) { currentKey = best.dataset.feat; activate(currentKey); }
+      }
+      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      currentKey = feats[0].dataset.feat;
+      activate(currentKey);   // 초기 상태
+      update();
+    })();
+  </script>
+</body>
+</html>

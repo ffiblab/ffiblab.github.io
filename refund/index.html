@@ -4,175 +4,113 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Refund Policy — PenSound</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <meta name="description" content="PenSound refund policy — a 14-day money-back guarantee, no questions asked, plus a free 14-day trial before you buy." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ffiblab.com/refund/" />
+  <meta property="og:title" content="Refund Policy — PenSound" />
+  <meta property="og:description" content="14-day money-back guarantee, no questions asked." />
+  <meta property="og:image" content="https://ffiblab.com/assets/og-pensound.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@ffiblab" />
+  <meta name="twitter:title" content="Refund Policy — PenSound" />
+  <meta name="twitter:description" content="14-day money-back guarantee, no questions asked." />
+  <meta name="twitter:image" content="https://ffiblab.com/assets/og-pensound.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;1,9..144,200&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="../assets/tokens.css" />
   <style>
-    :root {
-      --blue: #3B82F6;
-      --ink: #1a1a2e;
-      --ink-mid: #4a5568;
-      --ink-light: #94a3b8;
-      --white: #ffffff;
-    }
+    .frame { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    header { border-bottom: var(--line) solid var(--border); position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); z-index: 20; }
+    .nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; padding-bottom: 14px; }
+    .nav-mark { font-size: 15px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg); text-decoration: none; }
+    .nav-mark span { color: var(--accent); }
+    .nav-home { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: rgba(0,0,0,0.45); text-decoration: none; text-transform: uppercase; }
+    .nav-home:hover { color: var(--accent); }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      background: var(--white);
-      color: var(--ink);
-      -webkit-font-smoothing: antialiased;
-    }
+    .lede-head { padding-top: clamp(48px, 8vh, 96px); padding-bottom: var(--space-4); }
+    .lede-head .sec-label { display: block; margin-bottom: 16px; }
+    .lede-head h1 { font-size: clamp(36px, 6vw, 60px); text-transform: uppercase; }
+    .updated { margin-top: 16px; font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.45); }
 
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 48px;
-      border-bottom: 1px solid rgba(59,130,246,0.08);
-    }
+    .doc { border-top: var(--line) solid var(--border); padding-top: var(--space-4); padding-bottom: var(--space-5); }
+    .prose { max-width: 680px; }
+    .prose .sec { padding: 22px 0; border-top: 1px solid rgba(0,0,0,0.12); }
+    .prose .sec:first-child { border-top: none; padding-top: 0; }
+    .prose h2 { font-size: 17px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 10px; }
+    .prose p { font-size: 15px; font-weight: 500; line-height: 1.75; color: rgba(0,0,0,0.62); }
+    .prose a { color: var(--accent); text-decoration: none; font-weight: 700; }
+    .prose a:hover { text-decoration: underline; }
+    .callout { border: var(--line) solid var(--border); background: var(--muted); padding: 18px 20px; }
+    .callout p { color: var(--fg); font-weight: 700; font-size: 16px; line-height: 1.6; }
 
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .nav-icon { width: 28px; height: 28px; }
-
-    .nav-name {
-      font-family: 'Fraunces', serif;
-      font-weight: 300;
-      font-size: 17px;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
-
-    .content {
-      max-width: 640px;
-      margin: 80px auto 120px;
-      padding: 0 24px;
-    }
-
-    .page-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 16px;
-    }
-
-    h1 {
-      font-family: 'Fraunces', serif;
-      font-size: 40px;
-      font-weight: 200;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--ink);
-      margin-bottom: 8px;
-    }
-
-    .updated {
-      font-size: 13px;
-      color: var(--ink-light);
-      margin-bottom: 56px;
-    }
-
-    .section {
-      margin-bottom: 40px;
-    }
-
-    h2 {
-      font-size: 15px;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 15px;
-      color: var(--ink-mid);
-      line-height: 1.75;
-    }
-
-    a { color: var(--blue); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .highlight {
-      background: rgba(59,130,246,0.06);
-      border-left: 2px solid var(--blue);
-      border-radius: 0 8px 8px 0;
-      padding: 16px 20px;
-      margin-top: 8px;
-    }
-
-    .highlight p {
-      color: var(--ink);
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 24px;
-      font-size: 12px;
-      color: var(--ink-light);
-      border-top: 1px solid rgba(0,0,0,0.06);
-    }
-
-    footer a { color: var(--ink-light); }
-    footer a:hover { color: var(--blue); }
+    footer { border-top: var(--line) solid var(--border); font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.5); }
+    .foot-inner { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); padding-bottom: var(--space-4); flex-wrap: wrap; gap: 12px; }
+    footer nav { display: flex; gap: 20px; }
+    footer a { color: rgba(0,0,0,0.5); text-decoration: none; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+    footer a:hover { color: var(--accent); }
   </style>
 </head>
-<body>
+<body class="tx-noise">
+  <header>
+    <div class="frame nav">
+      <a class="nav-mark" href="../">ffiblab<span>.</span></a>
+      <a class="nav-home" href="../pensound/">PenSound</a>
+    </div>
+  </header>
 
-  <nav>
-    <a href="/" class="nav-brand">
-      <img src="icon.png" alt="PenSound" class="nav-icon" onerror="this.style.display='none'" />
-      <span class="nav-name">PenSound</span>
-    </a>
-  </nav>
-
-  <div class="content">
-    <p class="page-label">Legal</p>
-    <h1>Refund Policy</h1>
-    <p class="updated">Last updated: March 2026</p>
-
-    <div class="section">
-      <h2>14-day money-back guarantee</h2>
-      <div class="highlight">
-        <p>If you're not satisfied with PenSound for any reason, you can request a full refund within 14 days of purchase — no questions asked.</p>
+  <main>
+    <div class="lede-head tx-grid">
+      <div class="frame">
+        <span class="sec-label">Legal</span>
+        <h1 class="display">Refund Policy</h1>
+        <p class="updated">Last updated: March 2026</p>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Try before you buy</h2>
-      <p>PenSound comes with a free 14-day trial that requires no sign-up and no credit card. We encourage you to try it fully before purchasing. If you do decide to buy and later change your mind, our refund window matches the trial period so you're never at risk.</p>
+    <div class="doc">
+      <div class="frame prose">
+        <div class="sec">
+          <h2>14-day money-back guarantee</h2>
+          <div class="callout">
+            <p>If you're not satisfied with PenSound for any reason, you can request a full refund within 14 days of purchase — no questions asked.</p>
+          </div>
+        </div>
+        <div class="sec">
+          <h2>Try before you buy</h2>
+          <p>PenSound comes with a free 14-day trial that requires no sign-up and no credit card. We encourage you to try it fully before purchasing. If you do decide to buy and later change your mind, our refund window matches the trial period so you're never at risk.</p>
+        </div>
+        <div class="sec">
+          <h2>How to request a refund</h2>
+          <p>Send an email to <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a> with your order number or the email address used at checkout. We'll process your refund promptly through Lemon Squeezy, our payment processor.</p>
+        </div>
+        <div class="sec">
+          <h2>After a refund</h2>
+          <p>Once a refund is issued, your license key will be deactivated and the app will revert to trial mode. You're welcome to continue using the trial.</p>
+        </div>
+        <div class="sec">
+          <h2>Questions</h2>
+          <p>If you have any questions or concerns, reach out at <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>.</p>
+        </div>
+      </div>
     </div>
-
-    <div class="section">
-      <h2>How to request a refund</h2>
-      <p>Send an email to <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a> with your order number or the email address used at checkout. We'll process your refund promptly through Lemon Squeezy, our payment processor.</p>
-    </div>
-
-    <div class="section">
-      <h2>After a refund</h2>
-      <p>Once a refund is issued, your license key will be deactivated and the app will revert to trial mode. You're welcome to continue using the trial.</p>
-    </div>
-
-    <div class="section">
-      <h2>Questions</h2>
-      <p>If you have any questions or concerns, reach out at <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>.</p>
-
-    </div>
-
-  </div>
+  </main>
 
   <footer>
-    <a href="/">← Back to PenSound</a> &nbsp;·&nbsp;
-    <a href="/privacy">Privacy Policy</a>
+    <div class="frame foot-inner">
+      <span>© 2026 ffiblab</span>
+      <nav>
+        <a href="../privacy/">Privacy</a>
+        <a href="../refund/">Refund</a>
+        <a href="mailto:hello@ffiblab.com">Contact</a>
+      </nav>
+    </div>
   </footer>
-
 </body>
 </html>

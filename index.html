@@ -1,1317 +1,329 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PenSound — Every stroke, a sound.</title>
-  <meta name="description" content="PenSound brings the satisfying sounds of real drawing tools to your digital tablet. Pencil, colored pencil, fountain pen, crayon, and marker — react to pressure, speed, and tilt." />
+  <title>ffiblab</title>
+  <meta name="description" content="당신의 모든 순간에, 즐거움 한 스푼. ffiblab은 일상의 도구에 즐거움을 더하는 앱을 만듭니다. A spoonful of delight, in every moment." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ffiblab.com/" />
+  <meta property="og:title" content="ffiblab" />
+  <meta property="og:description" content="당신의 모든 순간에, 즐거움 한 스푼. A spoonful of delight, in every moment." />
+  <meta property="og:image" content="https://ffiblab.com/assets/og-pensound.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@ffiblab" />
+  <meta name="twitter:title" content="ffiblab" />
+  <meta name="twitter:description" content="당신의 모든 순간에, 즐거움 한 스푼. A spoonful of delight, in every moment." />
+  <meta name="twitter:image" content="https://ffiblab.com/assets/og-pensound.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,200;1,9..144,300&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="assets/tokens.css" />
   <style>
-    :root {
-      --blue: #3B82F6;
-      --blue-light: #60A5FA;
-      --blue-pale: #DBEAFE;
-      --blue-ghost: rgba(59,130,246,0.08);
-      --ink: #1a1a2e;
-      --ink-mid: #4a5568;
-      --ink-light: #94a3b8;
-      --white: #ffffff;
-      --off-white: #f8faff;
-      --paper: #f4f6fb;
+    /* ── 페이지 구조 ── */
+    .frame {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 5vw, 64px);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      background: var(--white);
-      color: var(--ink);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
+    /* ── 네비 ── */
+    header {
+      border-bottom: var(--line) solid var(--border);
+      position: relative;
+      z-index: 2;
     }
-
-    /* ─── NAV ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+    .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 48px;
-      background: rgba(255,255,255,0.72);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(59,130,246,0.08);
-      transition: background 0.3s;
+      padding-top: 18px;
+      padding-bottom: 18px;
     }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .nav-icon {
-      width: 32px; height: 32px;
-    }
-
-    .nav-name {
-      font-family: 'Fraunces', serif;
-      font-weight: 300;
-      font-size: 18px;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 20px;
-      background: var(--blue);
-      color: white;
-      border-radius: 50px;
-      font-size: 14px;
-      font-weight: 400;
-      text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
-
-    /* ─── HERO ─── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 24px 80px;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-    }
-
-
-
-5%   { opacity: 1; }
-      100% { stroke-dashoffset: 0; opacity: 1; }
-    }
-
-    .hero-content { position: relative; z-index: 1; max-width: 700px; }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 14px;
-      border: 1px solid rgba(59,130,246,0.3);
-      border-radius: 50px;
-      font-size: 12px;
-      color: var(--blue);
+    .nav-mark {
+      font-size: 15px;
+      font-weight: 900;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-bottom: 32px;
-      background: rgba(59,130,246,0.04);
-      animation: fadeUp 0.8s ease both;
-    }
-
-    .hero-badge-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--blue);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.7); }
-    }
-
-    .hero-app-icon {
-      width: 96px; height: 96px;
-      margin: 0 auto 32px;
-      display: block;
-      filter: drop-shadow(0 20px 40px rgba(59,130,246,0.3));
-      animation: fadeUp 0.8s 0.1s ease both;
-    }
-
-    .hero-title {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(52px, 8vw, 88px);
-      font-weight: 200;
-      line-height: 1.0;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-      margin-bottom: 12px;
-      animation: fadeUp 0.8s 0.2s ease both;
-    }
-
-    .hero-title em {
-      font-style: italic;
-      color: var(--blue);
-    }
-
-    .hero-tagline {
-      font-size: 18px;
-      color: var(--ink-mid);
-      margin-bottom: 40px;
-      font-weight: 300;
-      letter-spacing: 0.01em;
-      animation: fadeUp 0.8s 0.3s ease both;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.8s 0.4s ease both;
-    }
-
-    .btn-primary {
-      padding: 14px 32px;
-      background: var(--blue);
-      color: white;
-      border-radius: 50px;
-      font-size: 15px;
-      font-weight: 400;
+      color: var(--fg);
       text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 24px rgba(59,130,246,0.35);
     }
+    .nav-mark span { color: var(--accent); }
 
-    .btn-primary:hover {
-      opacity: 0.88;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(59,130,246,0.4);
+    /* ── 히어로: 워드마크가 로고다 ── */
+    .hero {
+      padding-top: clamp(56px, 10vh, 128px);
+      padding-bottom: clamp(56px, 10vh, 128px);
+      position: relative;
     }
-
-    .btn-secondary {
-      padding: 14px 28px;
-      background: transparent;
-      color: var(--ink-mid);
-      border-radius: 50px;
-      font-size: 15px;
-      font-weight: 400;
-      text-decoration: none;
-      border: 1px solid rgba(0,0,0,0.12);
-      transition: border-color 0.2s, color 0.2s;
+    .wordmark {
+      font-size: clamp(72px, 17vw, 208px);
+      text-transform: none;   /* 소문자 워드마크 — 유일한 대문자 규칙 예외 */
     }
-
-    .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
-
-    .hero-meta {
-      margin-top: 56px;
-      font-size: 13px;
-      color: var(--ink-light);
-      animation: fadeUp 0.8s 0.5s ease both;
+    .wordmark .dot { color: var(--accent); }
+    .tagline {
+      margin-top: var(--space-4);
+      max-width: 560px;
     }
-
-    /* scroll indicator */
-    .scroll-hint {
-      position: absolute;
-      bottom: 36px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      opacity: 0.4;
-      animation: fadeIn 1s 1.2s ease both;
-    }
-
-    .scroll-line {
-      width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--blue), transparent);
-      animation: scrollLine 1.8s ease-in-out infinite;
-    }
-
-    @keyframes scrollLine {
-      0% { transform: scaleY(0); transform-origin: top; }
-      50% { transform: scaleY(1); transform-origin: top; }
-      51% { transform-origin: bottom; }
-      100% { transform: scaleY(0); transform-origin: bottom; }
-    }
-
-    /* ─── SECTION SHARED ─── */
-    section {
-      padding: 100px 24px;
-    }
-
-    .section-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 16px;
-      font-weight: 400;
-    }
-
-    .section-title {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 200;
+    .tagline .main {
+      font-size: clamp(20px, 2.6vw, 28px);
+      font-weight: 700;
       letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--ink);
-      margin-bottom: 16px;
+      line-height: 1.35;
+    }
+    .tagline .sub {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.55);
     }
 
-    .section-title em { font-style: italic; color: var(--blue); }
-
-    .section-desc {
-      font-size: 16px;
-      color: var(--ink-mid);
-      max-width: 480px;
-      line-height: 1.7;
-    }
-
-
-    /* ─── TOOL VIDEO PLAYER ─── */
-    .tool-card { cursor: pointer; }
-
-    .tool-card.active {
-      border-color: rgba(59,130,246,0.4);
-      background: rgba(59,130,246,0.03);
-    }
-
-    .tool-card.active .tool-icon-wrap {
-      background: rgba(59,130,246,0.15);
-    }
-
-    .tool-video-wrap {
-      grid-column: 1 / -1;
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-      opacity: 0;
-    }
-
-    .tool-video-wrap.open {
-      max-height: 640px;
-      opacity: 1;
-    }
-
-    .tool-video-inner {
-      background: var(--paper);
-      border-radius: 20px;
-      border: 1px solid rgba(59,130,246,0.1);
-      overflow: hidden;
-      margin-top: 16px;
-      position: relative;
-      aspect-ratio: 16/9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tool-video-inner video {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .tool-video-placeholder {
+    /* 히어로 우측 기하 구성 — 장식이 아니라 그리드의 표명 (바우하우스식) */
+    .hero-geo {
       position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      color: var(--ink-light);
-      font-size: 13px;
+      right: clamp(20px, 6vw, 96px);
+      top: clamp(56px, 10vh, 128px);
+      width: clamp(120px, 20vw, 240px);
+      aspect-ratio: 1;
+      display: none;
     }
-
-    .tool-video-placeholder svg {
-      width: 32px; height: 32px;
-      opacity: 0.35;
-      color: var(--blue);
+    @media (min-width: 900px) { .hero-geo { display: block; } }
+    .hero-geo .sq {
+      position: absolute; inset: 0;
+      border: var(--line-thick) solid var(--border);
+      background: var(--bg);
     }
-
-    /* ─── TOOLS ─── */
-    .tools-section { background: var(--off-white); }
-
-    .tools-header { margin-bottom: 56px; }
-
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-    }
-
-    .tool-card {
-      background: white;
-      border-radius: 20px;
-      padding: 32px 20px 28px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      border: 1px solid rgba(59,130,246,0.08);
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      cursor: default;
-    }
-
-    .tool-card:hover {
-      border-color: rgba(59,130,246,0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 48px rgba(59,130,246,0.10);
-    }
-
-    .tool-icon-wrap {
-      width: 56px; height: 56px;
-      background: var(--blue-ghost);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tool-icon-wrap svg {
-      width: 28px; height: 28px;
-      color: var(--blue);
-    }
-
-    .tool-name {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--ink);
-      text-align: center;
-    }
-
-    .tool-desc {
-      font-size: 12px;
-      color: var(--ink-light);
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    /* ─── FEATURES ─── */
-    .features-section { background: white; }
-
-    .features-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-      margin-top: 60px;
-    }
-
-    .feature-list { display: flex; flex-direction: column; gap: 0; }
-
-    .feature-item {
-      display: flex;
-      gap: 20px;
-      padding: 28px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      transition: opacity 0.3s;
-    }
-
-    .feature-item:last-child { border-bottom: none; }
-
-    .feature-num {
-      font-family: 'Fraunces', serif;
-      font-size: 13px;
-      font-style: italic;
-      color: var(--blue-light);
-      min-width: 24px;
-      padding-top: 3px;
-    }
-
-    .feature-text { flex: 1; }
-
-    .feature-title {
-      font-size: 15px;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 4px;
-    }
-
-    .feature-body {
-      font-size: 13px;
-      color: var(--ink-light);
-      line-height: 1.6;
-    }
-
-    /* screenshot placeholder */
-    .features-visual {
-      position: relative;
-    }
-
-    .screenshot-frame {
-      background: var(--paper);
-      border-radius: 28px;
-      padding: 32px;
-      border: 1px solid rgba(59,130,246,0.1);
-      box-shadow: 0 32px 80px rgba(59,130,246,0.12), 0 4px 16px rgba(0,0,0,0.04);
-      position: relative;
-    }
-
-    .screenshot-img {
-      width: 100%;
-      border-radius: 16px;
-      display: block;
-    }
-
-    /* wave graphic placeholder */
-    .wave-vis {
-      margin-top: 20px;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 48px;
-      padding: 0 4px;
-    }
-
-    .wave-bar {
-      flex: 1;
-      background: var(--blue-light);
-      border-radius: 2px;
-      opacity: 0.6;
-      animation: waveBounce 1.2s ease-in-out infinite;
-    }
-
-    @keyframes waveBounce {
-      0%, 100% { transform: scaleY(0.4); }
-      50% { transform: scaleY(1); }
-    }
-
-
-    /* ─── PRICING ─── */
-    .pricing-section { background: var(--off-white); }
-
-    .pricing-card {
-      max-width: 440px;
-      margin: 56px auto 0;
-      background: white;
-      border-radius: 28px;
-      padding: 48px 40px;
-      border: 1px solid rgba(59,130,246,0.15);
-      box-shadow: 0 24px 64px rgba(59,130,246,0.10);
-      text-align: center;
-    }
-
-    .pricing-tag {
-      display: inline-block;
-      padding: 4px 12px;
-      background: var(--blue-ghost);
-      border-radius: 50px;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 24px;
-    }
-
-    .pricing-price {
-      font-family: 'Fraunces', serif;
-      font-size: 64px;
-      font-weight: 200;
-      letter-spacing: -0.04em;
-      color: var(--ink);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .pricing-price sup {
-      font-size: 28px;
-      vertical-align: super;
-      font-weight: 300;
-    }
-
-    .pricing-sub {
-      font-size: 13px;
-      color: var(--ink-light);
-      margin-bottom: 36px;
-    }
-
-    .pricing-perks {
-      list-style: none;
-      text-align: left;
-      margin-bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .pricing-perks li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      color: var(--ink-mid);
-    }
-
-    .perk-check {
-      width: 18px; height: 18px;
+    .hero-geo .ci {
+      position: absolute;
+      width: 58%; aspect-ratio: 1;
       border-radius: 50%;
-      background: var(--blue-ghost);
-      display: flex;
+      background: var(--accent-bright);
+      right: -14%; bottom: -14%;
+    }
+    .hero-geo .ln {
+      position: absolute;
+      left: 22%; top: -12%;
+      width: var(--line-thick); height: 60%;
+      background: var(--border);
+    }
+
+    /* ── 섹션 공통 ── */
+    section {
+      border-top: var(--line) solid var(--border);
+      padding-top: var(--space-4);
+      padding-bottom: var(--space-5);
+    }
+    .sec-head { margin-bottom: var(--space-4); }
+
+    /* ── 제품 카드: 반전 호버 ── */
+    .product {
+      display: grid;
+      grid-template-columns: 96px 1fr auto;
+      gap: var(--space-3);
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .perk-check svg {
-      width: 10px; height: 10px;
-      stroke: var(--blue);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .pricing-btn {
-      display: block;
-      width: 100%;
-      padding: 16px;
-      background: var(--blue);
-      color: white;
-      border-radius: 50px;
-      font-size: 15px;
-      font-weight: 400;
+      border: var(--line) solid var(--border);
+      background: var(--muted);
+      padding: var(--space-3);
       text-decoration: none;
-      margin-bottom: 14px;
-      transition: opacity 0.2s, transform 0.2s;
-      box-shadow: 0 4px 24px rgba(59,130,246,0.3);
+      color: var(--fg);
+      transition: background 150ms linear, color 150ms linear;
     }
-
-    .pricing-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    .pricing-btn-buy {
-      background: transparent;
-      color: var(--blue);
-      border: 1.5px solid rgba(59,130,246,0.3);
-      box-shadow: none;
-      margin-top: -4px;
+    .product:hover { background: var(--accent); color: #fff; }
+    .product:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .product img { width: 96px; height: 96px; display: block; }
+    .product h3 {
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
     }
-
-    .pricing-btn-buy:hover {
-      border-color: var(--blue);
-      background: rgba(59,130,246,0.04);
-    }
-
-    .pricing-trial {
-      font-size: 12px;
-      color: var(--ink-light);
-    }
-
-    /* ─── FOOTER ─── */
-    footer {
-      background: var(--ink);
-      padding: 60px 24px 48px;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .footer-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-
-    .footer-brand .nav-name { color: rgba(255,255,255,0.85); font-size: 20px; }
-
-    .footer-tagline {
-      font-size: 13px;
+    .product p {
       margin-top: 6px;
-      font-style: italic;
-      font-family: 'Fraunces', serif;
-      color: rgba(255,255,255,0.3);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: rgba(0,0,0,0.6);
+      transition: color 150ms linear;
+    }
+    .product:hover p { color: rgba(255,255,255,0.85); }
+    .product .os {
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      transition: color 150ms linear;
+    }
+    .product:hover .os { color: #fff; }
+    .product .arrow {
+      font-size: 32px;
+      font-weight: 900;
+      transition: transform 150ms ease-out;
+    }
+    .product:hover .arrow { transform: translateX(6px); }
+    @media (max-width: 640px) {
+      .product { grid-template-columns: 64px 1fr; }
+      .product img { width: 64px; height: 64px; }
+      .product .arrow { display: none; }
     }
 
-    .footer-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 12px;
-      text-align: right;
-    }
-
-    .footer-meta a {
-      color: rgba(255,255,255,0.4);
+    /* ── 연락처 ── */
+    .contact-mail {
+      display: inline-block;
+      font-size: clamp(20px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
       text-decoration: none;
-      transition: color 0.2s;
+      border-bottom: 3px solid var(--fg);
+      padding-bottom: 2px;
+      transition: color 150ms linear, border-color 150ms linear;
     }
+    .contact-mail:hover { color: var(--accent); border-color: var(--accent); }
 
-    .footer-meta a:hover { color: rgba(255,255,255,0.8); }
-
-    .footer-bottom {
-      max-width: 1000px;
-      margin: 40px auto 0;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,0.08);
+    /* ── 푸터 ── */
+    footer {
+      border-top: var(--line) solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.5);
+    }
+    .foot-inner {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding-top: var(--space-3);
+      padding-bottom: var(--space-4);
     }
-
-    /* ─── ANIMATIONS ─── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    footer nav { display: flex; gap: 20px; }
+    footer a {
+      color: rgba(0,0,0,0.5);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .reveal {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    .reveal.hidden {
-      opacity: 0;
-      transform: translateY(24px);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
-      .tools-grid { grid-template-columns: repeat(3, 1fr); }
-      .tools-grid .tool-card:nth-child(4),
-      .tools-grid .tool-card:nth-child(5) { grid-column: span 1; }
-      .features-layout { grid-template-columns: 1fr; }
-      .features-visual { order: -1; }
-      .footer-meta { text-align: left; }
-    }
-
-    @media (max-width: 480px) {
-      .tools-grid { grid-template-columns: repeat(2, 1fr); }
-      .tool-card:last-child { grid-column: span 2; }
-      .pricing-card { padding: 36px 24px; }
-    }
+    footer a:hover { color: var(--accent); }
   </style>
 </head>
-<body>
-
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-brand">
-      <img src="icon.png" alt="PenSound" class="nav-icon" onerror="this.style.display='none'" />
-      <span class="nav-name">PenSound</span>
-    </a>
-    <a href="https://ffib.lemonsqueezy.com/checkout/buy/f84845af-0b7d-467b-8e5b-e30f11ab6111" target="_blank" rel="noopener" class="nav-cta">Buy — $4.99</a>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero">
-
-    <div class="hero-content" style="opacity:1;transform:none;">
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        macOS App
-      </div>
-      <img src="icon.png" alt="PenSound Icon" class="hero-app-icon" />
-      <h1 class="hero-title">Every stroke,<br><em>a sound.</em></h1>
-      <p class="hero-tagline">The sound of real drawing tools — on any tablet, in any app.</p>
-      <div class="hero-actions">
-        <a href="https://ffiblab.github.io/pensound-releases/PenSound.dmg" class="btn-primary">Download Free Trial</a>
-        <a href="#features" class="btn-secondary">Learn more</a>
-      </div>
-      <p class="hero-meta">macOS 14 Sonoma or later &nbsp;·&nbsp; 14-day free trial &nbsp;·&nbsp; One-time purchase &nbsp;·&nbsp; EN &nbsp;KO &nbsp;JA &nbsp;ZH</p>
-    </div>
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-    </div>
-  </section>
-
-  <!-- TOOLS -->
-  <section class="tools-section">
-    <div class="section-inner">
-      <div class="tools-header reveal">
-        <p class="section-label">Sound Library</p>
-        <h2 class="section-title">Five tools.<br><em>Five textures.</em></h2>
-        <p class="section-desc">Each instrument is crafted from real recordings, shaped by how you actually draw.</p>
-      </div>
-      <div class="tools-grid" id="toolsGrid">
-        <!-- Pencil -->
-        <div class="tool-card reveal" data-tool="pencil" style="transition-delay:0.05s">
-          <div class="tool-icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M9 4 h6 v12 l-3 5 l-3 -5 z"/><path d="M9 7 h6"/><path d="M11 7 v9"/><path d="M13 7 v9"/><path d="M9 16 q 1.5 -1.5 3 0 q 1.5 -1.5 3 0"/></g></svg>
-          </div>
-          <span class="tool-name">Pencil</span>
-          <span class="tool-desc">Soft graphite scratch with paper grain</span>
-        </div>
-        <!-- Color Pencil -->
-        <div class="tool-card reveal" data-tool="coloredpencil" style="transition-delay:0.10s">
-          <div class="tool-icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M15 16 v-8 a3 3 0 0 0 -6 0 v8 l3 5 l3 -5 z"/><path d="M9 16 q 1.5 -1.5 3 0 q 1.5 -1.5 3 0"/><path d="M9 10 l6 2"/><path d="M9 13 l6 2"/></g></svg>
-          </div>
-          <span class="tool-name">Colored Pencil</span>
-          <span class="tool-desc">Waxy and smooth, with a faint whisper of friction</span>
-        </div>
-        <!-- Fountain Pen -->
-        <div class="tool-card reveal" data-tool="fountainpen" style="transition-delay:0.15s">
-          <div class="tool-icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M10 2 h4 l-1 10 h-2 z"/><path d="M11 12 v3 h2 v-3"/><path d="M11 15 l1 6 l1 -6"/><path d="M12 15 v3"/><path d="M14 4 c 1 0 1.5 0.5 1.5 1 v4 c 0 0.5 -0.5 1 -1.5 1"/></g></svg>
-          </div>
-          <span class="tool-name">Fountain Pen</span>
-          <span class="tool-desc">Sharp metal nib gliding through ink on paper</span>
-        </div>
-        <!-- Crayon -->
-        <div class="tool-card reveal" data-tool="crayon" style="transition-delay:0.20s">
-          <div class="tool-icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M8 4 h8 v13 l-2 4 h-4 l-2 -4 z"/><path d="M8 8 h8"/><path d="M8 14 h8"/><path d="M8 11 q 2 -2 4 0 t 4 0"/></g></svg>
-          </div>
-          <span class="tool-name">Crayon</span>
-          <span class="tool-desc">Firm wax pressed heavy against the page</span>
-        </div>
-        <!-- Marker -->
-        <div class="tool-card reveal" data-tool="marker" style="transition-delay:0.25s">
-          <div class="tool-icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(45 12 12)"><path d="M7 2 h10 v12 h-10 z"/><path d="M7 8 h10"/><path d="M8 14 h8 v2 h-8 z"/><path d="M9 16 v5 l5 -2 v-3"/></g></svg>
-          </div>
-          <span class="tool-name">Marker</span>
-          <span class="tool-desc">Clean, decisive strokes with ink body</span>
-        </div>
-        <!-- Video Player -->
-        <div class="tool-video-wrap" id="toolVideoWrap">
-          <div class="tool-video-inner">
-            <video id="toolVideo" playsinline autoplay loop>
-              <source id="toolVideoSrc" src="" type="video/mp4" />
-            </video>
-            <div class="tool-video-placeholder" id="toolVideoPlaceholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
-              <span>Click a tool to hear it</span>
-            </div>
-          </div>
-        </div>
+<body class="tx-noise">
+  <header>
+    <div class="frame nav">
+      <a class="nav-mark" href="./">ffiblab<span>.</span></a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- FEATURES -->
-  <section class="features-section" id="features">
-    <div class="section-inner">
-      <div class="features-layout">
-        <div class="feature-list reveal">
-          <p class="section-label">How It Works</p>
-          <h2 class="section-title" style="margin-bottom:40px">Sound that<br>follows your <em>hand.</em></h2>
-          <div class="feature-item">
-            <span class="feature-num">01</span>
-            <div class="feature-text">
-              <p class="feature-title">Pressure, speed, and tilt</p>
-              <p class="feature-body">Every variable of your stroke shapes the sound in real time — press harder for a denser tone, move faster for a sharper crackle, tilt the pen and the texture shifts, just like on paper.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <span class="feature-num">02</span>
-            <div class="feature-text">
-              <p class="feature-title">Fine-tune to your hand</p>
-              <p class="feature-body">Every tablet feels different. Customize the pressure curve to match yours, and dial in the tone of each tool to exactly the sound you want to hear.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <span class="feature-num">03</span>
-            <div class="feature-text">
-              <p class="feature-title">Works everywhere, invisibly</p>
-              <p class="feature-body">PenSound hooks into your tablet driver at the system level — no plugins, no per-app setup. Prefer to keep it to specific apps? Add or exclude any app in one click.</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <span class="feature-num">04</span>
-            <div class="feature-text">
-              <p class="feature-title">Mute key</p>
-              <p class="feature-body">Hold Space to pan the canvas — PenSound stays quiet while you're not drawing, so the sound never breaks your flow.</p>
-            </div>
-          </div>
-        </div>
-        <div class="features-visual reveal" style="transition-delay:0.2s">
-          <div style="display:flex; align-items:center; justify-content:center; padding:16px 0;">
-
-            <!-- PenSound Interactive Mockup -->
-            <style>
-              .ps-wrap{display:flex;justify-content:center;padding:0}
-              .ps-panel{width:320px;background:rgba(245,246,250,0.95);border-radius:14px;border:0.5px solid rgba(59,130,246,0.10);padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;box-shadow:0 32px 80px rgba(59,130,246,0.18), 0 4px 16px rgba(0,0,0,0.04)}
-              .ps-card{background:rgba(255,255,255,0.82);border-radius:10px;border:0.5px solid rgba(0,0,0,0.08)}
-              .ps-card-clip{overflow:hidden}
-              .ps-row{display:flex;align-items:center;padding:8px 12px;gap:8px}
-              .ps-divider{height:0.5px;background:rgba(0,0,0,0.07);margin-left:12px}
-              .ps-label{font-size:12.5px;font-weight:500;color:#1a1a2e;flex:1;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-sublabel{font-size:11px;font-weight:500;color:#64748b;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-badge{font-size:11px;font-weight:500;color:#3B82F6;background:rgba(59,130,246,0.10);border-radius:5px;padding:2px 5px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;user-select:none;transition:background 0.13s}
-              .ps-badge:hover{background:rgba(59,130,246,0.18)}
-              .ps-badge.ps-recording{color:#f97316;background:rgba(249,115,22,0.12)}
-              .ps-toggle{position:relative;width:32px;height:18px;cursor:pointer;flex-shrink:0}
-              .ps-toggle input{opacity:0;width:0;height:0;position:absolute}
-              .ps-toggle-track{position:absolute;inset:0;background:#ccc;border-radius:18px;transition:background 0.2s}
-              .ps-toggle input:checked+.ps-toggle-track{background:#3B82F6}
-              .ps-toggle-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left 0.2s;pointer-events:none}
-              .ps-toggle input:checked~.ps-toggle-thumb{left:16px}
-              .ps-popover-wrap{position:relative;display:inline-block}
-              .ps-popover{position:absolute;top:calc(100% + 6px);left:50%;width:210px;background:rgba(255,255,255,0.98);border-radius:10px;border:0.5px solid rgba(0,0,0,0.10);box-shadow:0 8px 24px rgba(0,0,0,0.13);z-index:200;overflow:hidden;opacity:0;pointer-events:none;transform:translateX(-50%) translateY(-4px);transition:opacity 0.15s,transform 0.15s}
-              .ps-popover.ps-open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
-              .ps-popover-header{padding:9px 12px;font-size:11.5px;font-weight:600;color:#64748b;font-family:-apple-system,BlinkMacSystemFont,sans-serif;border-bottom:0.5px solid rgba(0,0,0,0.07)}
-              .ps-app-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:0.5px solid rgba(0,0,0,0.05)}
-              .ps-app-icon{width:22px;height:22px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-app-name{font-size:12px;color:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,sans-serif;flex:1}
-              .ps-app-remove{width:16px;height:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.3;transition:opacity 0.13s;flex-shrink:0}
-              .ps-app-remove:hover{opacity:0.7}
-              .ps-app-remove svg{width:14px;height:14px;pointer-events:none}
-              .ps-popover-add{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 12px;font-size:12px;font-weight:500;color:#3B82F6;font-family:-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;border-top:0.5px solid rgba(0,0,0,0.07);transition:background 0.13s}
-              .ps-popover-add:hover{background:rgba(59,130,246,0.05)}
-              .ps-popover-empty{padding:16px 12px;font-size:12px;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-align:center}
-              .ps-tools-row{display:flex;align-items:center;padding:9px 12px}
-              .ps-tools-label{font-size:12px;font-weight:500;color:#1a1a2e;width:48px;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-chips{display:flex;gap:3px;flex:1}
-              .ps-chip{flex:1;display:flex;align-items:center;justify-content:center;padding:4px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:background 0.13s,border-color 0.13s}
-              .ps-chip:hover{background:rgba(0,0,0,0.05)}
-              .ps-chip.ps-active{background:rgba(59,130,246,0.12);border-color:rgba(59,130,246,0.25)}
-              .ps-chip svg{width:16px;height:16px}
-              .ps-chip svg path,.ps-chip svg line,.ps-chip svg rect,.ps-chip svg polyline,.ps-chip svg circle{stroke:#94a3b8}
-              .ps-chip.ps-active svg path,.ps-chip.ps-active svg line,.ps-chip.ps-active svg rect,.ps-chip.ps-active svg polyline,.ps-chip.ps-active svg circle{stroke:#3B82F6}
-              .ps-ts-header{display:flex;align-items:center;padding:9px 12px 7px}
-              .ps-ts-title{font-size:11px;font-weight:600;color:#64748b;flex:1;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-icon-btn{width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.13s;user-select:none}
-              .ps-icon-btn:hover{background:rgba(0,0,0,0.14)}
-              .ps-icon-btn svg{display:block;pointer-events:none}
-              .ps-pressure-row{display:flex;align-items:center;padding:8px 12px;gap:8px}
-              .ps-icon-label{display:flex;align-items:center;gap:4px;width:68px}
-              .ps-graph-toggle-wrap{position:relative;width:12px;height:12px;flex-shrink:0;cursor:pointer;user-select:none}
-              .ps-graph-toggle-wrap svg{width:12px;height:12px;display:block;pointer-events:none;position:relative;z-index:1}
-              .ps-hint-ring{position:absolute;top:50%;left:50%;width:12px;height:12px;border-radius:50%;background:rgba(59,130,246,0.25);transform:translate(-50%,-50%) scale(1);animation:psHintPulse 1.8s ease-out infinite;pointer-events:none}
-              .ps-hint-ring.ps-gone{display:none}
-              @keyframes psHintPulse{0%{transform:translate(-50%,-50%) scale(1);opacity:0.7}70%{transform:translate(-50%,-50%) scale(2.6);opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
-              .ps-preset-slider-wrap{flex:1;position:relative;height:14px;cursor:pointer}
-              .ps-preset-track{position:absolute;top:50%;left:0;right:0;height:4px;background:rgba(0,0,0,0.10);border-radius:4px;transform:translateY(-50%)}
-              .ps-preset-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(to right,rgba(59,130,246,0.6),#3B82F6);border-radius:4px;transition:width 0.2s}
-              .ps-preset-dots{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%)}
-              .ps-preset-dot{position:absolute;width:4px;height:4px;background:rgba(0,0,0,0.20);border-radius:50%;transform:translate(-50%,-50%);transition:background 0.2s}
-              .ps-preset-dot.ps-active{background:rgba(59,130,246,0.5)}
-              .ps-preset-handle{position:absolute;top:50%;width:14px;height:14px;background:white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.20);transform:translate(-50%,-50%);transition:left 0.2s;pointer-events:none}
-              .ps-value-label{font-size:10.5px;color:#94a3b8;width:50px;text-align:right;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-graph-wrap{overflow:hidden;transition:max-height 0.25s ease,opacity 0.25s ease;max-height:0;opacity:0}
-              .ps-graph-wrap.ps-open{max-height:120px;opacity:1}
-              .ps-graph-inner{margin:4px 12px 8px}
-              .ps-graph-svg{width:100%;height:100px;background:rgba(0,0,0,0.03);border-radius:8px;display:block;cursor:crosshair}
-              .ps-slider-row{display:flex;align-items:center;padding:8px 12px;gap:8px}
-              .ps-slider-label{display:flex;align-items:center;gap:5px;width:68px;font-size:11.5px;font-weight:500;color:#1a1a2e;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-              .ps-slider-label svg{width:12px;height:12px;flex-shrink:0}
-              .ps-slider-track-wrap{flex:1;position:relative;height:14px;cursor:pointer}
-              .ps-slider-track{position:absolute;top:50%;left:0;right:0;height:4px;background:rgba(0,0,0,0.10);border-radius:4px;transform:translateY(-50%)}
-              .ps-slider-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(to right,rgba(59,130,246,0.6),#3B82F6);border-radius:4px}
-              .ps-slider-thumb{position:absolute;top:50%;width:14px;height:14px;background:white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.20);transform:translate(-50%,-50%);pointer-events:none}
-              .ps-slider-val{font-size:10.5px;color:#94a3b8;width:50px;text-align:right;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
-            </style>
-
-            <div class="ps-wrap">
-             <div class="ps-panel">
-
-              <div class="ps-card">
-               <div class="ps-row">
-                <span class="ps-label">Enable</span>
-                <label class="ps-toggle"><input type="checkbox" checked><div class="ps-toggle-track"></div><div class="ps-toggle-thumb"></div></label>
-               </div>
-               <div class="ps-divider"></div>
-               <div class="ps-row" style="overflow:visible;position:relative;z-index:10">
-                <div class="ps-popover-wrap">
-                 <span class="ps-badge" id="ps-targetAppsBadge">Target Apps</span>
-                 <div class="ps-popover" id="ps-appsPopover">
-                  <div class="ps-popover-header">Target Apps</div>
-                  <div id="ps-appList"></div>
-                  <div class="ps-popover-add" id="ps-addAppBtn">
-                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg>
-                   Add App
-                  </div>
-                 </div>
-                </div>
-                <span class="ps-label" style="margin-left:4px">only</span>
-                <label class="ps-toggle"><input type="checkbox" checked><div class="ps-toggle-track"></div><div class="ps-toggle-thumb"></div></label>
-               </div>
-               <div class="ps-divider"></div>
-               <div class="ps-row">
-                <span class="ps-label">Hold <span class="ps-badge" id="ps-muteBadge">Space</span> to Mute</span>
-                <label class="ps-toggle"><input type="checkbox" checked><div class="ps-toggle-track"></div><div class="ps-toggle-thumb"></div></label>
-               </div>
-              </div>
-
-              <div class="ps-card ps-card-clip">
-               <div class="ps-tools-row">
-                <span class="ps-tools-label">Tools</span>
-                <div class="ps-chips" id="ps-toolChips">
-                 <div class="ps-chip ps-active" data-tool="Pencil"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M9 4h6v12l-3 5-3-5z"/><path d="M9 7h6"/><path d="M9 16q1.5-1.5 3 0q1.5-1.5 3 0"/></g></svg></div>
-                 <div class="ps-chip" data-tool="Colored Pencil"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M15 16v-8a3 3 0 0 0-6 0v8l3 5 3-5z"/><path d="M9 16q1.5-1.5 3 0q1.5-1.5 3 0"/><path d="M9 10l6 2"/><path d="M9 13l6 2"/></g></svg></div>
-                 <div class="ps-chip" data-tool="Fountain Pen"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M10 2h4l-1 10h-2z"/><path d="M11 12v3h2v-3"/><path d="M11 15l1 6 1-6"/></g></svg></div>
-                 <div class="ps-chip" data-tool="Crayon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M8 4h8v13l-2 4h-4l-2-4z"/><path d="M8 8h8"/><path d="M8 14h8"/></g></svg></div>
-                 <div class="ps-chip" data-tool="Marker"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M7 2h10v12h-10z"/><path d="M7 8h10"/><path d="M8 14h8v2h-8z"/><path d="M9 16v5l5-2v-3"/></g></svg></div>
-                </div>
-               </div>
-              </div>
-
-              <div class="ps-card ps-card-clip">
-               <div class="ps-ts-header">
-                <span class="ps-ts-title" id="ps-toolTitle">Tool Settings — Pencil</span>
-                <div class="ps-icon-btn" id="ps-resetBtn">
-                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"><path d="M8.5 5A3.5 3.5 0 1 1 5 1.5M5 1.5l1.5-1.5M5 1.5l1.5 1.5"/></svg>
-                </div>
-               </div>
-               <div class="ps-divider"></div>
-               <div class="ps-pressure-row">
-                <div class="ps-icon-label">
-                 <div class="ps-graph-toggle-wrap" id="ps-graphToggleBtn">
-                  <div class="ps-hint-ring" id="ps-hintRing"></div>
-                  <svg viewBox="0 0 75 85" fill="#3B82F6"><path d="M33.252 10.44C16.406 10.44 6.836 21.28 6.836 39.0v7.666c0 6.738 3.223 10.888 6.885 10.888.83 0 1.27-.44 1.27-1.221v-3.125c0-1.709.879-2.49 1.855-2.49 1.074 0 1.953.781 1.953 2.49v2.002c0 3.955 2.539 6.543 5.957 6.543 1.563 0 2.246-.635 2.246-1.953v-4.297c0-1.709.83-2.49 1.855-2.49 1.074 0 1.953.781 1.953 2.49v3.955c0 4.443 2.588 6.543 5.908 6.543 1.465 0 2.246-.684 2.246-1.953v-8.545c0-1.709.83-2.49 1.855-2.49 1.074 0 1.953.781 1.953 2.49v29.443c0 2.832 1.855 4.737 4.248 4.737 2.637 0 4.394-1.904 4.394-4.737V36.6c0-1.074.684-1.66 1.367-1.66s1.221.44 1.709 1.514l5.615 12.476c.83 1.953 2.149 2.832 3.906 2.832 2.588 0 4.395-1.807 4.395-3.955 0-.928-.195-1.66-.39-2.246L61.816 27.45C56.299 11.14 45.703 10.44 33.252 10.44Z"/></svg>
-                 </div>
-                 <span class="ps-sublabel">Pressure</span>
-                </div>
-                <div class="ps-preset-slider-wrap" id="ps-presetSlider">
-                 <div class="ps-preset-track"><div class="ps-preset-fill" id="ps-presetFill"></div></div>
-                 <div class="ps-preset-dots" id="ps-presetDots"></div>
-                 <div class="ps-preset-handle" id="ps-presetHandle"></div>
-                </div>
-                <span class="ps-value-label" id="ps-presetLabel">Standard</span>
-               </div>
-               <div class="ps-graph-wrap" id="ps-graphWrap">
-                <div class="ps-graph-inner">
-                 <svg class="ps-graph-svg" id="ps-bezierSvg" viewBox="0 0 266 100" preserveAspectRatio="none"></svg>
-                </div>
-               </div>
-               <div class="ps-divider"></div>
-               <div class="ps-slider-row">
-                <div class="ps-slider-label">
-                 <svg viewBox="0 0 12 12" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="3" width="1.5" height="6" rx="0.5"/><rect x="3.5" y="1.5" width="1.5" height="9" rx="0.5"/><rect x="6" y="3.5" width="1.5" height="5" rx="0.5"/><rect x="8.5" y="2" width="1.5" height="8" rx="0.5"/></svg>
-                 Tone
-                </div>
-                <div class="ps-slider-track-wrap" id="ps-toneTrack">
-                 <div class="ps-slider-track"><div class="ps-slider-fill" id="ps-toneFill"></div></div>
-                 <div class="ps-slider-thumb" id="ps-toneThumb"></div>
-                </div>
-                <span class="ps-slider-val" id="ps-toneVal">1.00x</span>
-               </div>
-              </div>
-
-              <div class="ps-card ps-card-clip">
-               <div class="ps-slider-row">
-                <div class="ps-slider-label">
-                 <svg viewBox="0 0 12 12" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4.5h2l3-3v9l-3-3H1z"/><path d="M8 4a3 3 0 0 1 0 4"/></svg>
-                 Volume
-                </div>
-                <div class="ps-slider-track-wrap" id="ps-volTrack">
-                 <div class="ps-slider-track"><div class="ps-slider-fill" id="ps-volFill"></div></div>
-                 <div class="ps-slider-thumb" id="ps-volThumb"></div>
-                </div>
-                <span class="ps-slider-val" id="ps-volVal">50%</span>
-               </div>
-              </div>
-
-             </div>
-            </div>
-
-            <script>
-            (function(){
-              var presets=[{name:'Softer',cp1:[0.20,0.50],cp2:[0.60,0.90]},{name:'Soft',cp1:[0.20,0.35],cp2:[0.65,0.80]},{name:'Standard',cp1:[0.25,0.25],cp2:[0.75,0.75]},{name:'Hard',cp1:[0.35,0.15],cp2:[0.80,0.65]},{name:'Harder',cp1:[0.50,0.10],cp2:[0.90,0.55]}];
-              var defaults={'Pencil':{presetIdx:2,tone:0.50},'Colored Pencil':{presetIdx:1,tone:0.45},'Fountain Pen':{presetIdx:3,tone:0.70},'Crayon':{presetIdx:4,tone:0.30},'Marker':{presetIdx:2,tone:0.60}};
-              var ts={};for(var t in defaults)ts[t]={presetIdx:defaults[t].presetIdx,tone:defaults[t].tone,cp1:presets[defaults[t].presetIdx].cp1.slice(),cp2:presets[defaults[t].presetIdx].cp2.slice()};
-              var activeTool='Pencil',graphOpen=false,dragging=null,hintDismissed=false;
-              var PAD=10;
-              function cur(){return ts[activeTool];}
-
-              var apps=[{id:'photoshop',name:'Photoshop',color:'#31A8FF'},{id:'clipstudio',name:'Clip Studio Paint',color:'#C4383A'}];
-              function renderApps(){
-                var list=document.getElementById('ps-appList');
-                if(apps.length===0){list.innerHTML='<div class="ps-popover-empty">No apps added</div>';return;}
-                list.innerHTML=apps.map(function(a){return'<div class="ps-app-row"><div class="ps-app-icon" style="background:'+a.color+'">'+a.name[0]+'</div><span class="ps-app-name">'+a.name+'</span><div class="ps-app-remove" data-id="'+a.id+'"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg></div></div>';}).join('');
-                list.querySelectorAll('.ps-app-remove').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();apps=apps.filter(function(a){return a.id!==btn.dataset.id;});renderApps();});});
-              }
-              renderApps();
-
-              var popoverOpen=false;
-              document.getElementById('ps-targetAppsBadge').addEventListener('click',function(e){e.stopPropagation();popoverOpen=!popoverOpen;document.getElementById('ps-appsPopover').classList.toggle('ps-open',popoverOpen);});
-              document.getElementById('ps-addAppBtn').addEventListener('click',function(e){e.stopPropagation();});
-              document.addEventListener('click',function(){if(popoverOpen){popoverOpen=false;document.getElementById('ps-appsPopover').classList.remove('ps-open');}});
-              document.getElementById('ps-appsPopover').addEventListener('click',function(e){e.stopPropagation();});
-
-              var recording=false;
-              var muteBadge=document.getElementById('ps-muteBadge');
-              muteBadge.addEventListener('click',function(e){e.stopPropagation();recording=!recording;if(recording){muteBadge.textContent='Press a key...';muteBadge.classList.add('ps-recording');}else{muteBadge.classList.remove('ps-recording');}});
-              var keyNames={' ':'Space','Escape':'Esc','Enter':'Return','Tab':'Tab','Backspace':'Delete','ArrowLeft':'←','ArrowRight':'→','ArrowUp':'↑','ArrowDown':'↓'};
-              document.addEventListener('keydown',function(e){if(!recording)return;e.preventDefault();var name=keyNames[e.key]||(e.key.length===1?e.key.toUpperCase():e.key);muteBadge.textContent=name;muteBadge.classList.remove('ps-recording');recording=false;});
-
-              function bezierY(x,cp1,cp2){var t=x,lo=0,hi=1;for(var i=0;i<16;i++){var bx=3*t*(1-t)*(1-t)*cp1[0]+3*t*t*(1-t)*cp2[0]+t*t*t;if(Math.abs(bx-x)<0.001)break;if(bx<x)lo=t;else hi=t;t=(lo+hi)/2;}return 3*t*(1-t)*(1-t)*cp1[1]+3*t*t*(1-t)*cp2[1]+t*t*t;}
-
-              function renderPreset(){var c=cur(),n=presets.length-1,frac=c.presetIdx/n;document.getElementById('ps-presetFill').style.width=(frac*100)+'%';document.getElementById('ps-presetHandle').style.left=(frac*100)+'%';document.getElementById('ps-presetLabel').textContent=presets[c.presetIdx].name;var dots=document.getElementById('ps-presetDots');dots.innerHTML='';for(var i=0;i<=n;i++){var d=document.createElement('div');d.className='ps-preset-dot'+(i<=c.presetIdx?' ps-active':'');d.style.left=(i/n*100)+'%';dots.appendChild(d);}}
-
-              function renderBezier(){var c=cur(),svg=document.getElementById('ps-bezierSvg'),W=266,H=100,gw=W-PAD*2,gh=H-PAD*2;var pts=[];for(var i=0;i<=60;i++){var x=i/60;pts.push([PAD+x*gw,PAD+(1-bezierY(x,c.cp1,c.cp2))*gh]);}var lp=pts.map(function(p){return p.join(',');}).join(' ');var fp=PAD+','+(PAD+gh)+' '+lp+' '+(PAD+gw)+','+(PAD+gh);var c1=[PAD+c.cp1[0]*gw,PAD+(1-c.cp1[1])*gh],c2=[PAD+c.cp2[0]*gw,PAD+(1-c.cp2[1])*gh];svg.innerHTML='<line x1="'+PAD+'" y1="'+(PAD+gh)+'" x2="'+(PAD+gw)+'" y2="'+PAD+'" stroke="rgba(0,0,0,0.12)" stroke-width="1" stroke-dasharray="3,3"/><polygon points="'+fp+'" fill="rgba(59,130,246,0.07)"/><polyline points="'+lp+'" fill="none" stroke="rgba(59,130,246,0.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="'+c1[0]+'" cy="'+c1[1]+'" r="5" fill="#3B82F6" stroke="white" stroke-width="1.5" style="cursor:grab" data-cp="1"/><circle cx="'+c2[0]+'" cy="'+c2[1]+'" r="5" fill="#3B82F6" stroke="white" stroke-width="1.5" style="cursor:grab" data-cp="2"/>';svg.querySelectorAll('circle[data-cp]').forEach(function(c){c.addEventListener('mousedown',function(e){e.preventDefault();dragging=c.dataset.cp;});});}
-
-              function renderTone(){var f=cur().tone;document.getElementById('ps-toneFill').style.width=(f*100)+'%';document.getElementById('ps-toneThumb').style.left=(f*100)+'%';document.getElementById('ps-toneVal').textContent=(0.75+f*0.5).toFixed(2)+'x';}
-              function renderAll(){renderPreset();renderBezier();renderTone();}
-              function applyPreset(idx){var c=cur();c.presetIdx=idx;c.cp1=presets[idx].cp1.slice();c.cp2=presets[idx].cp2.slice();renderPreset();renderBezier();}
-
-              function makeDrag(id,fn){var el=document.getElementById(id);var active=false;function upd(e){var r=el.getBoundingClientRect();fn(Math.min(Math.max((e.clientX-r.left)/r.width,0),1));}el.addEventListener('mousedown',function(e){active=true;upd(e);});el.addEventListener('touchstart',function(e){active=true;upd(e.touches[0]);},{passive:true});document.addEventListener('mousemove',function(e){if(active)upd(e);});document.addEventListener('touchmove',function(e){if(active)upd(e.touches[0]);},{passive:true});document.addEventListener('mouseup',function(){active=false;});document.addEventListener('touchend',function(){active=false;});}
-
-              document.getElementById('ps-graphToggleBtn').addEventListener('click',function(){if(!hintDismissed){hintDismissed=true;document.getElementById('ps-hintRing').classList.add('ps-gone');}graphOpen=!graphOpen;document.getElementById('ps-graphWrap').classList.toggle('ps-open',graphOpen);});
-              document.getElementById('ps-resetBtn').addEventListener('click',function(){var d=defaults[activeTool];ts[activeTool]={presetIdx:d.presetIdx,tone:d.tone,cp1:presets[d.presetIdx].cp1.slice(),cp2:presets[d.presetIdx].cp2.slice()};renderAll();});
-              document.getElementById('ps-toolChips').addEventListener('click',function(e){var chip=e.target.closest('.ps-chip');if(!chip)return;document.querySelectorAll('.ps-chip').forEach(function(c){c.classList.remove('ps-active');});chip.classList.add('ps-active');activeTool=chip.dataset.tool;document.getElementById('ps-toolTitle').textContent='Tool Settings — '+activeTool;renderAll();});
-
-              document.addEventListener('mousemove',function(e){if(!dragging)return;var svg=document.getElementById('ps-bezierSvg'),rect=svg.getBoundingClientRect();var W=rect.width,H=rect.height,padX=PAD*W/266,gw=W-padX*2,gh=H-PAD*2,c=cur();var nx=Math.min(Math.max((e.clientX-rect.left-padX)/gw,0.01),0.99);var ny=Math.min(Math.max(1-(e.clientY-rect.top-PAD)/gh,0.01),0.99);if(dragging==='1'){nx=Math.min(nx,c.cp2[0]);c.cp1=[nx,ny];}else{nx=Math.max(nx,c.cp1[0]);c.cp2=[nx,ny];}renderBezier();});
-              document.addEventListener('mouseup',function(){dragging=null;});
-
-              makeDrag('ps-presetSlider',function(f){applyPreset(Math.round(f*(presets.length-1)));});
-              makeDrag('ps-toneTrack',function(f){cur().tone=f;renderTone();});
-              makeDrag('ps-volTrack',function(f){document.getElementById('ps-volFill').style.width=(f*100)+'%';document.getElementById('ps-volThumb').style.left=(f*100)+'%';document.getElementById('ps-volVal').textContent=Math.round(f*100)+'%';});
-
-              renderAll();
-              document.getElementById('ps-volFill').style.width='50%';
-              document.getElementById('ps-volThumb').style.left='50%';
-            })();
-            </script>
-          </div>
+  <main>
+    <div class="hero tx-grid">
+      <div class="frame">
+        <h1 class="display wordmark">ffib<br />lab<span class="dot">.</span></h1>
+        <div class="tagline">
+          <p class="main" data-i18n="tagline"></p>
+          <p class="sub" data-i18n="taglineSub"></p>
         </div>
       </div>
-    </div>
-  </section>
-
-
-  <!-- PRICING -->
-  <section class="pricing-section" id="pricing">
-    <div class="section-inner" style="text-align:center">
-      <div class="reveal">
-        <p class="section-label">Pricing</p>
-        <h2 class="section-title">One price.<br><em>Yours forever.</em></h2>
-
-      </div>
-      <div class="pricing-card reveal" style="transition-delay:0.15s">
-        <span class="pricing-tag">Launch Price</span>
-        <div class="pricing-price"><sup>$</sup>4.99</div>
-        <p class="pricing-sub">
-          Early adopter price — won't last.<br>
-          No subscriptions. No renewals.
-        </p>
-        <ul class="pricing-perks">
-          <li>
-            <span class="perk-check">
-              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
-            </span>
-            Lifetime license — yours forever
-          </li>
-          <li>
-            <span class="perk-check">
-              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
-            </span>
-            All future updates included
-          </li>
-          <li>
-            <span class="perk-check">
-              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
-            </span>
-            Use on up to 2 Macs
-          </li>
-          <li>
-            <span class="perk-check">
-              <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
-            </span>
-            14-day free trial, no sign-up needed
-          </li>
-        </ul>
-        <a href="https://ffiblab.github.io/pensound-releases/PenSound.dmg" class="pricing-btn">Download Free Trial</a>
-        <a href="https://ffib.lemonsqueezy.com/checkout/buy/f84845af-0b7d-467b-8e5b-e30f11ab6111" target="_blank" rel="noopener" class="pricing-btn pricing-btn-buy">Buy — $4.99</a>
-        <p class="pricing-trial">No sign-up needed. Purchase only after you love it.</p>
+      <div class="hero-geo" aria-hidden="true">
+        <div class="sq"></div>
+        <div class="ln"></div>
+        <div class="ci"></div>
       </div>
     </div>
-  </section>
 
-  <!-- FOOTER -->
+    <section id="products">
+      <div class="frame">
+        <div class="sec-head">
+          <span class="sec-label" data-i18n="secProducts"></span>
+        </div>
+        <a class="product" href="pensound/">
+          <img src="assets/pensound-icon.png" alt="" width="96" height="96" />
+          <div>
+            <h3>PenSound</h3>
+            <p data-i18n="pensoundDesc"></p>
+            <div class="os">macOS&ensp;·&ensp;<span data-i18n="windowsSoon"></span></div>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="frame">
+        <div class="sec-head">
+          <span class="sec-label" data-i18n="secContact"></span>
+        </div>
+        <a class="contact-mail" href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>
+      </div>
+    </section>
+  </main>
+
   <footer>
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="nav-name" style="font-family:'Fraunces',serif; font-weight:300; color:rgba(255,255,255,0.85); font-size:20px">PenSound</div>
-        <div class="footer-tagline">Every stroke, a sound.</div>
-      </div>
-      <div class="footer-meta">
-        <a href="/cdn-cgi/l/email-protection#137b767f7f7c5375757a717f72713d707c7e">Contact</a>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/refund">Refund Policy</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 PenSound by ffib lab. All rights reserved.</span>
-      <span>macOS 14 Sonoma or later</span>
+    <div class="frame foot-inner">
+      <span>© 2026 ffiblab</span>
+      <nav>
+        <a href="privacy/" data-i18n="privacy"></a>
+        <a href="refund/" data-i18n="refund"></a>
+      </nav>
     </div>
   </footer>
 
-  <!-- scroll stroke + reveal -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // ── Tool card video interaction ──────────────────────────
-    const toolCards = document.querySelectorAll('.tool-card[data-tool]');
-    const videoWrap = document.getElementById('toolVideoWrap');
-    const videoEl   = document.getElementById('toolVideo');
-    const videoSrc  = document.getElementById('toolVideoSrc');
-    const placeholder = document.getElementById('toolVideoPlaceholder');
-    let activeCard = null;
+  <script>
+    // ── 한/영 병기 (추후 언어 추가 = STRINGS에 항목 추가) ──
+    const STRINGS = {
+      ko: {
+        tagline: "당신의 모든 순간에,\n즐거움 한 스푼.",
+        taglineSub: "A spoonful of delight, in every moment.",
+        secProducts: "01 — 제품",
+        secContact: "02 — 연락처",
+        pensoundDesc: "타블렛에서 사라진 펜 소리를 되찾아주는 앱이에요.",
+        windowsSoon: "Windows 준비 중",
+        privacy: "개인정보 처리방침",
+        refund: "환불 정책",
+      },
+      en: {
+        tagline: "A spoonful of delight,\nin every moment.",
+        taglineSub: "당신의 모든 순간에, 즐거움 한 스푼.",
+        secProducts: "01 — Products",
+        secContact: "02 — Contact",
+        pensoundDesc: "The app that brings real pen sounds back to your drawing tablet.",
+        windowsSoon: "Windows coming soon",
+        privacy: "Privacy",
+        refund: "Refund",
+      },
+    };
 
-    toolCards.forEach(card => {
-      card.addEventListener('click', () => {
-        const tool = card.dataset.tool;
-
-        // Toggle off if same card clicked again
-        if (activeCard === card) {
-          card.classList.remove('active');
-          videoWrap.classList.remove('open');
-          videoEl.pause();
-          activeCard = null;
-          return;
-        }
-
-        // Deactivate previous
-        if (activeCard) activeCard.classList.remove('active');
-        card.classList.add('active');
-        activeCard = card;
-
-        // Swap video source
-        const src = 'videos/' + tool + '.mp4';
-        videoSrc.src = src;
-        videoEl.load();
-
-        // Show video, hide placeholder once loaded
-        videoEl.style.display = 'block';
-        placeholder.style.display = 'none';
-
-        // Handle missing file gracefully
-        videoEl.onerror = () => {
-          videoEl.style.display = 'none';
-          placeholder.style.display = 'flex';
-          placeholder.querySelector('span').textContent = 'Video coming soon';
-        };
-
-        videoEl.oncanplay = () => {
-          videoEl.play();
-        };
-
-        // Open panel
-        videoWrap.classList.add('open');
-
-        // Scroll video into view smoothly
-        setTimeout(() => {
-          videoWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
+    function setLang(lang) {
+      const dict = STRINGS[lang] || STRINGS.en;
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const v = dict[el.dataset.i18n];
+        if (v == null) return;
+        el.innerHTML = v.replace(/\n/g, "<br />");   // 태그라인 줄바꿈
       });
+      document.querySelectorAll(".lang-toggle button").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+      });
+      try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
+    }
+
+    document.querySelectorAll(".lang-toggle button").forEach((b) => {
+      b.addEventListener("click", () => setLang(b.dataset.lang));
     });
 
-    // ── Scroll-progress stroke (dashoffset reveal) ───────────
-    // One continuous S-curve path fixed in document space,
-    // rendered as an absolutely-positioned SVG behind content.
-    // stroke-dashoffset is driven by scroll progress so the line
-    // appears to be drawn from top to bottom as the user scrolls.
-
-    const strokeSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    strokeSvg.setAttribute('id','strokeSvg');
-    strokeSvg.setAttribute('aria-hidden','true');
-    Object.assign(strokeSvg.style, {
-      position:'absolute', top:'0', left:'0',
-      width:'100%', height:'100%',
-      pointerEvents:'none', zIndex:'0',
-      overflow:'visible'
-    });
-
-    // Insert as first child of body so it sits behind everything
-    document.body.insertBefore(strokeSvg, document.body.firstChild);
-    document.body.style.position = 'relative';
-
-    const strokePath = document.createElementNS('http://www.w3.org/2000/svg','path');
-    strokePath.setAttribute('fill','none');
-    strokePath.setAttribute('stroke','rgba(59,130,246,0.15)');
-    strokePath.setAttribute('stroke-wid(strokePath);
-
-    function buildStroke() {
-      const W = window.innerWidth;
-      const H = document.body.scrollHeight;
-      const vH = window.innerHeight;
-      const segH = vH * 0.9;
-
-      // Build S-curve waypoints in absolute document coordinates
-      // Alternates between right and left side
-      const waypoints = [];
-      let y = vH * 0.15;
-      let side = 0; // 0=right, 1=left
-      const xR = W * 0.80;
-      const xL = W * 0.20;
-
-      waypoints.push({ x: xR, y });
-
-      while (y < H + segH) {
-        y += segH;
-        side = 1 - side;
-        waypoints.push({ x: side === 0 ? xR : xL, y });
-      }
-
-      // Build smooth bezier path through waypoints
-      let d = `M${waypoints[0].x},${waypoints[0].y}`;
-      for (let i = 1; i < waypoints.length; i++) {
-        const p = waypoints[i - 1];
-        const c = waypoints[i];
-        const midY = p.y + (c.y - p.y) * 0.5;
-        d += ` C${p.x},${midY} ${c.x},${midY} ${c.x},${c.y}`;
-      }
-
-      strokePath.setAttribute('d', d);
-
-      // Measure total path length and set dasharray
-      const len = strokePath.getTotalLength();
-      strokePath.setAttribute('stroke-dasharray', len);
-      strokePath.dataset.len = len;
-
-      // Apply current scroll position immediately
-      applyScroll();
-    }
-
-    function applyScroll() {
-      const len = parseFloat(strokePath.dataset.len || 0);
-      if (!len) return;
-      const scrollY = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
-      // offset goes from len (hidden) → 0 (fully drawn)
-      const offset = len * (1 - progress);
-      strokePath.setAttribute('stroke-dashoffset', offset);
-    }
-
-    window.addEventListener('scroll', applyScroll, { passive: true });
-    window.addEventListener('resize', () => { buildStroke(); }, { passive: true });
-
-    // Build after fonts/layout settle
-    if (document.readyState === 'complete') {
-      buildStroke();
-    } else {
-      window.addEventListener('load', buildStroke);
-    }
-
-    // ── Reveal ──────────────────────────────────────────────
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          revealObserver.unobserve(e.target);
-        }
-      });
-    }, { thresho
+    let initial = null;
+    try { initial = localStorage.getItem("ffiblab-lang"); } catch (e) {}
+    if (!initial) initial = (navigator.language || "en").startsWith("ko") ? "ko" : "en";
+    setLang(initial);
+  </script>
+</body>
+</html>
