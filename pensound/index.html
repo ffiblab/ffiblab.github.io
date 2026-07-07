@@ -232,6 +232,8 @@
     .dl-cta { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
     .dl-cta .btn { min-height: 64px; font-size: 16px; padding: 0 44px; text-transform: none; letter-spacing: 0.04em; }
     .dl-cta .win { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+    .dl-cta a.win { color: var(--accent); text-decoration: none; }
+    .dl-cta a.win:hover { text-decoration: underline; }
     /* 가격: 얼리 액세스 특가 + 정가(취소선) */
     .price { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding-bottom: 4px; }
     .price-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
@@ -426,10 +428,11 @@
                 <span class="price-was"><em data-i18n="priceRegLabel"></em> <s data-i18n="priceReg"></s></span>
               </div>
               <span class="price-note" data-i18n="priceNote"></span>
+              <span class="price-note" data-i18n="priceFx"></span>
               <span class="price-after" data-i18n="priceAfter"></span>
             </div>
             <a class="btn" href="https://ffiblab.github.io/pensound-releases/PenSound.dmg" data-i18n="dlCta"></a>
-            <span class="win" data-i18n="dlWin"></span>
+            <a class="win" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlWin"></a>
           </div>
         </div>
       </div>
@@ -482,15 +485,16 @@
         secDownload: "03 — 다운로드",
         // ⬇︎ 가격 — priceEarly(얼리) / priceReg(정가)
         priceTag: "얼리 액세스 특가",
-        priceEarly: "₩7,900",
+        priceEarly: "US$5.99",
         priceRegLabel: "정가",
-        priceReg: "₩13,900",
+        priceReg: "US$9.99",
         priceNote: "한 번 구매 · 구독 없음 · 평생 업데이트",
+        priceFx: "미국 달러로 결제되며, 원화 금액은 환율에 따라 달라져요",
         priceAfter: "정식 출시 후 정가로 인상돼요",
         dlTitle: "14일 동안,<br />무료로 들어보세요<span class='dot'>.</span>",
         dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔 모두 지원해요<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
         dlCta: "macOS용 다운로드",
-        dlWin: "Windows — 준비 중",
+        dlWin: "Windows 베타 — 테스터 모집 중 →",
         privacy: "개인정보 처리방침", refund: "환불 정책", contact: "문의",
       },
       en: {
@@ -529,11 +533,12 @@
         priceRegLabel: "Reg.",
         priceReg: "$9.99",
         priceNote: "One-time purchase · No subscription · Free updates",
+        priceFx: "",
         priceAfter: "Goes up to full price at launch",
         dlTitle: "Try it free<br />for 14 days<span class='dot'>.</span>",
         dlMeta: "macOS 13+ · Apple Silicon & Intel<br />One license for both Windows & macOS — up to 2 devices, mix freely",
         dlCta: "Download for macOS",
-        dlWin: "Windows — coming soon",
+        dlWin: "Windows beta — join the test →",
         privacy: "Privacy", refund: "Refund", contact: "Contact",
       },
     };
