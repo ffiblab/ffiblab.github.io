@@ -87,6 +87,24 @@
     }
     .paper-screen.has-ink .paper-clear { opacity: 1; pointer-events: auto; }
     .paper-clear:hover { background: var(--fg); color: var(--bg); }
+    /* 소리 잠금 해제 칩 — 오디오 컨텍스트가 잠긴 채 획이 끝났을 때만 나타남 */
+    .paper-sound {
+      position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 3;
+      display: flex; align-items: center; gap: 7px;
+      appearance: none; cursor: pointer;
+      border: var(--line) solid var(--fg); background: var(--bg); color: var(--fg);
+      font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      padding: 9px 14px;
+      animation: sound-nudge 1.6s ease-in-out infinite;
+    }
+    .paper-sound[hidden] { display: none; }
+    .paper-sound svg { width: 14px; height: 14px; }
+    .paper-sound:hover { background: var(--fg); color: var(--bg); }
+    @keyframes sound-nudge {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .paper-sound { animation: none; } }
     /* 도구 선택 — 세그먼트 컨트롤 (lang-toggle와 같은 언어) */
     .demo-tools { margin-top: 14px; display: flex; justify-content: center; }
     .demo-toolset { display: inline-flex; border: var(--line) solid var(--border); }
@@ -137,7 +155,7 @@
     .palette-desc p { font-size: 14.5px; font-weight: 500; line-height: 1.7; color: rgba(0,0,0,0.65); margin-bottom: 12px; }
     /* 차별 기능 강조 블록 (홀드 뮤트 / 필압 감도·커브) */
     .feats { margin-top: 22px; }
-    .feat { position: relative; padding: 14px 0 14px 24px; min-height: 40vh; display: flex; flex-direction: column; justify-content: center; }
+    .feat { position: relative; padding: 14px 0 14px 24px; min-height: 52vh; display: flex; flex-direction: column; justify-content: center; }  /* 스텝당 체류 시간 — 목업 연출을 볼 여유 */
     /* 활성 설명 옆에서 자라나는 강조 바 (스크롤에 반응) */
     .feat::before {
       content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
@@ -154,6 +172,40 @@
     .feat span { font-size: 13.5px; font-weight: 500; line-height: 1.65; color: rgba(0,0,0,0.6); }
 
     .mock-stage { background: var(--muted); border: var(--line) solid var(--border); padding: clamp(24px, 4vw, 56px); display: flex; justify-content: center; }
+
+    /* ── 메뉴바 장면: '메뉴바에 사는 도구'를 그대로 보여준다 (메뉴바 + 커서 클릭 → 팔레트 드롭) ── */
+    .mock-scene { width: min(100%, 340px); position: relative; }
+    .mock-menubar {
+      display: flex; align-items: center; justify-content: flex-end; gap: 3px;
+      height: 27px; padding: 0 10px;
+      background: #FBFBFD; color: #1d1d1f;
+      border: 1px solid rgba(0,0,0,0.12); border-radius: 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      font-family: var(--font-sans);
+    }
+    .mb-item { display: inline-flex; align-items: center; justify-content: center; height: 21px; padding: 0 6px; border-radius: 5px; }
+    .mb-item svg { width: 14px; height: 14px; }
+    .mb-dim { opacity: 0.66; }
+    .mb-clock { font-size: 10.5px; font-weight: 600; padding-left: 7px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    /* 클릭 눌림 하이라이트 — 팔레트가 열려 있는 동안 유지 (macOS와 동일) */
+    .mock-scene.mb-pressed .mb-app { background: rgba(0,0,0,0.14); }
+
+    /* 팔레트 열림/닫힘 — 메뉴바 아이콘 지점에서 펼쳐진다 */
+    .mock-scene .mock {
+      margin-top: 10px;
+      transform-origin: 57% top;
+      transition: opacity 200ms ease-out, transform 260ms cubic-bezier(0.2, 0.8, 0.3, 1.12);
+    }
+    .mock-scene:not(.is-open) .mock { opacity: 0; transform: translateY(-10px) scale(0.94); }
+
+    /* macOS 화살표 커서 — JS가 transform으로 이동시킨다 */
+    .mock-cursor {
+      position: absolute; left: 0; top: 0; width: 21px; height: 21px; z-index: 4;
+      opacity: 0; pointer-events: none;
+      transition: transform 720ms cubic-bezier(0.3, 0.7, 0.2, 1), opacity 180ms linear;
+    }
+    .mock-scene.cursor-visible .mock-cursor { opacity: 1; }
+
     .mock {
       width: 290px; background: #F4F4F6; border-radius: 12px;
       border: 1px solid rgba(0,0,0,0.12);
@@ -184,6 +236,15 @@
     }
     .mock-cap svg { position: absolute; left: 8px; top: 4px; width: 14px; height: 14px; opacity: 0.55; }
     .mock-cap .val { position: absolute; right: 9px; top: 4.5px; font-size: 9px; color: rgba(0,0,0,0.5); font-variant-numeric: tabular-nums; }
+    /* 커브 슬라이더 — 중앙(0)에서 양쪽으로 자라는 게이지. 가운데 눈금 = 0점 */
+    .mock-cap.cap-center::after {
+      content: ""; position: absolute; left: calc(50% - 0.5px); top: 5px; bottom: 5px;
+      width: 1px; background: rgba(0,0,0,0.25);
+    }
+    .mock-cap .fill.fill-curve {
+      border-radius: 0 11px 11px 0;   /* 바깥쪽만 트랙 곡률로 둥글게 — 중앙(0점)은 눈금에 붙는 평면 */
+      transition: width 900ms ease-in-out, left 900ms ease-in-out;
+    }
     .mock-tools { display: flex; justify-content: space-between; padding: 6px 4px; }
     .mock-tool { width: 40px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #3a4046; transition: background 300ms, color 300ms; }
     .mock-tool svg { width: 17px; height: 17px; }
@@ -192,7 +253,7 @@
 
     /* ── 03 설명 ↔ 목업 연동 (스크롤에 따라 고정 목업이 반응) ── */
     .mock { position: relative; }                 /* hush-cue 앵커 */
-    .mock-stage { position: sticky; top: calc(50vh - 165px); align-self: start; }
+    .mock-stage { position: sticky; top: calc(50vh - 195px); align-self: start; }  /* 메뉴바만큼 커진 높이 반영 */
     .feat { transition: opacity 200ms linear; }
     .feat[data-feat] { outline: none; }
     .feat b { transition: color 150ms linear; }
@@ -245,20 +306,22 @@
         z-index: 5;
         padding: 16px;
       }
-      /* 목업 아래 페이드 존 — 텍스트가 목업 밑으로 들어가며 흐려진다 */
+      /* 목업 아래 페이드 존 — 텍스트가 목업 밑으로 들어가며 흐려진다.
+         기준이 패딩 박스라 스테이지 자신의 아래 테두리를 덮어버리므로 border만큼 내려서 시작 */
       #palette .mock-stage::after {
         content: "";
         position: absolute;
-        left: 0; right: 0;
-        bottom: -64px;
+        left: calc(-1 * var(--line)); right: calc(-1 * var(--line));
+        bottom: calc(-64px - var(--line));
         height: 64px;
         background: linear-gradient(to bottom, var(--bg) 12%, rgba(255,255,255,0));
         pointer-events: none;
       }
-      /* 설명 블록은 목업 뒤(z 아래)로 흐른다 */
-      #palette .palette-desc { position: relative; z-index: 1; }
-      /* 모바일에선 강조 바가 필요 이상으로 커서 축소 */
-      #palette .feat { min-height: 34vh; }
+      /* 설명 블록은 목업 뒤(z 아래)로 흐른다 —
+         첫 제목이 목업 아래 페이드 존(64px)에 가려진 채 시작하지 않게 그만큼 내려서 출발 */
+      #palette .palette-desc { position: relative; z-index: 1; padding-top: 72px; }
+      /* 모바일에선 강조 바가 필요 이상으로 커서 축소 — 대신 스텝당 체류는 데스크톱처럼 넉넉히 */
+      #palette .feat { min-height: 44vh; }
     }
 
     /* ── 04 다운로드 ── */
@@ -331,6 +394,11 @@
             <canvas id="demoCanvas" aria-label="Sound demo canvas"></canvas>
             <div class="placeholder" id="demoPlaceholder" data-i18n="demoPlaceholder"></div>
             <button class="paper-clear" id="demoClear" type="button" data-i18n="clearLabel"></button>
+            <!-- iOS: 드래그 제스처로는 오디오 잠금이 안 풀린다 — 첫 획이 무음이면 탭 한 번을 유도 -->
+            <button class="paper-sound" id="demoSound" type="button" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5a4 4 0 0 1 0 5"/><path d="M18.8 7.2a7.2 7.2 0 0 1 0 9.6"/></svg>
+              <span data-i18n="soundChip"></span>
+            </button>
           </div>
           <div class="demo-tools">
            <div class="demo-toolset" role="group" aria-label="Demo tool">
@@ -390,7 +458,29 @@
         </div>
         <div class="palette-grid">
           <div class="mock-stage tx-grid">
-            <div class="mock" aria-hidden="true">
+            <div class="mock-scene" aria-hidden="true">
+              <div class="mock-menubar">
+                <span class="mb-item mb-app" id="mbApp">
+                  <!-- 실제 앱 메뉴바 아이콘 (PenSound/icon/menubar/nib-sound-arcs.svg) -->
+                  <svg viewBox="0 0 22 22" fill="none">
+                    <g transform="translate(1.6 -1.6) rotate(45 11 11) translate(11 11) scale(0.82) translate(-11 -11)">
+                      <path fill="currentColor" fill-rule="evenodd" d="M11 20 C9.1 17 7.6 13.6 7.6 10.2 L7.6 6.4 Q7.6 4.9 9.2 4.5 Q11 4.1 12.8 4.5 Q14.4 4.9 14.4 6.4 L14.4 10.2 C14.4 13.6 12.9 17 11 20 Z M10.55 12.55 L11.45 12.55 L11.45 16.5 L11 18.2 L10.55 16.5 Z M11 10.05 a1.05 1.05 0 1 0 0.001 2.1 a1.05 1.05 0 1 0 -0.001 -2.1 Z"/>
+                    </g>
+                    <g stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                      <path d="M7.12 17.61 A3 3 0 0 1 4.39 14.88"/>
+                      <path d="M6.93 19.8 A5.2 5.2 0 0 1 2.2 15.08"/>
+                    </g>
+                  </svg>
+                </span>
+                <span class="mb-item mb-dim">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 9 C8 4.3 16 4.3 21.5 9"/><path d="M5.5 12.5 C9.5 9.2 14.5 9.2 18.5 12.5"/><path d="M8.5 16 C10.6 14.3 13.4 14.3 15.5 16"/><circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/></svg>
+                </span>
+                <span class="mb-item mb-dim">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="8" width="17" height="8.5" rx="2.4"/><rect x="3.8" y="9.8" width="10" height="4.9" rx="1.1" fill="currentColor" stroke="none"/><path d="M20.8 10.8 v3"/></svg>
+                </span>
+                <span class="mb-clock" id="mbClock">Mon 9:41 AM</span>
+              </div>
+              <div class="mock">
               <div class="hush-cue">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4H4z" fill="currentColor" stroke="none"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
                 <kbd>Space</kbd>
@@ -421,17 +511,21 @@
                   <div class="mock-tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(45 12 12)"><path d="M7 2 h10 v12 h-10 z"/><path d="M7 8 h10"/><path d="M8 14 h8 v2 h-8 z"/><path d="M9 16 v5 l5 -2 v-3"/></g></svg></div>
                 </div>
                 <div class="curve-region" data-region="curve">
-                  <div class="mock-sec" data-i18n="mockToolSettings"></div>
+                  <div class="mock-sec"><span data-i18n="mockToolSettings"></span> — <span id="mockToolName"></span></div>
                   <div class="mock-cap"><div class="fill" id="mockPress" style="width:50%"></div>
                     <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v8.1M9.2 10.2L12 13.4l2.8-3.2M4.5 17.5h15"/></svg>
-                    <span class="val" data-i18n="mockStandard"></span>
+                    <span class="val" id="mockPressVal"></span>
                   </div>
-                  <div class="mock-cap"><div class="fill" style="left:50%; width:12%; border-radius:4px; transform:translateX(-50%);"></div>
+                  <div class="mock-cap cap-center"><div class="fill fill-curve" id="mockCurve" style="left:50%; width:0;"></div>
                     <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round"><path d="M3 12c1.8-6.4 4.4-6.4 6.2 0 1.4 4.8 3.2 4.8 4.6 0 1.1-3.6 2.3-3.6 3.4 0 .8 2.6 1.7 2.6 2.5 0"/></svg>
-                    <span class="val">0%</span>
+                    <span class="val" id="mockCurveVal">0%</span>
                   </div>
                 </div>
               </div>
+              </div>
+              <svg class="mock-cursor" id="mockCursor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 3 L6 19.2 L9.8 15.6 L12 20.6 L14.6 19.4 L12.4 14.5 L17.6 14 Z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
             </div>
           </div>
           <div class="palette-desc">
@@ -500,6 +594,7 @@
         sketchHint: "여기에 그려보세요!",
         demoPlaceholder: "여기를 드래그해 보세요",
         toolPen: "펜", toolCrayon: "크레용", clearLabel: "지우기",
+        soundChip: "탭해서 소리 켜기",
         secHow: "01 — 왜 소리일까",
         howTitle: "종이를 떠나며, 우리는 소리를 잃었어요",
         howSpeedT: "낙서가 다시 재밌어져요",
@@ -513,13 +608,14 @@
         paletteH: "그리는 동안, 조용히 구석에",
         paletteP: "메뉴바에서 팔레트를 열어 도구와 볼륨, 필압 반응을 바로 조절해요.",
         featMuteT: "꾹 누르면 잠깐 조용히 — 홀드 뮤트",
-        featMuteP: "정해둔 키를 누르고 있는 동안만 소리가 멈춰요. 통화 중에도, 회의 중에도 그림은 계속.",
+        featMuteP: "캔버스 이동(Space)이나 회전(R)처럼, 선을 긋지만 그리는 건 아닌 순간이 있죠. 정해둔 키를 누르고 있는 동안만 소리를 멈춰 — 몰입을 깨는 소리를 하나 더 덜어내요.",
         featCurveT: "내 손에 맞는 필압 — 감도와 커브",
         featCurveP: "프리셋으로 빠르게 고르고, 베지어 커브로 세밀하게 다듬어요. 도구마다 따로 기억해 둬요.",
         featToolsT: "네 가지 도구",
         featToolsP: "연필·만년필·크레용·마커. 원하는 앱에서만 켜지게 할 수도 있어요.",
-        mockToolSettings: "도구 설정 — 연필",
-        mockStandard: "표준",
+        mockToolSettings: "도구 설정",
+        mockToolPencil: "연필", mockToolFountain: "만년필", mockToolCrayon: "크레용", mockToolMarker: "마커",
+        pressSoft: "부드럽게", pressStandard: "표준", pressFirm: "단단하게",
         hushCue: "누르는 동안만 조용히",
         secDownload: "03 — 다운로드",
         // ⬇︎ 가격 — priceEarly(얼리) / priceReg(정가)
@@ -531,7 +627,7 @@
         priceFx: "미국 달러로 결제되며, 원화 금액은 환율에 따라 달라져요",
         priceAfter: "정식 출시 후 정가로 인상돼요",
         dlTitle: "14일 동안,<br />무료로 들어보세요<span class='dot'>.</span>",
-        dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔 모두 지원해요<br />Windows 10·11 · 64비트 지원해요<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
+        dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔<br />Windows 10·11 · 64비트<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
         dlCtaMac: "macOS용 다운로드",
         dlCtaWin: "Windows용 다운로드",
         dlBeta: "지금 macOS·Windows 모두 베타 테스터 모집 중 →",
@@ -545,6 +641,7 @@
         sketchHint: "Try drawing here!",
         demoPlaceholder: "Drag to make sound",
         toolPen: "Pen", toolCrayon: "Crayon", clearLabel: "Clear",
+        soundChip: "Tap for sound",
         secHow: "01 — Why sound",
         howTitle: "When we left paper, we lost the sound",
         howSpeedT: "Doodling gets fun again",
@@ -558,13 +655,14 @@
         paletteH: "Quietly in the corner while you draw",
         paletteP: "Open the palette from the menu bar to adjust tools, volume, and pressure response on the spot.",
         featMuteT: "Hold to hush — hold-to-mute",
-        featMuteP: "Sound pauses only while you hold the key. Keep sketching through calls and meetings.",
+        featMuteP: "Panning (Space) or rotating (R) the canvas drags the pen without drawing. Hold your chosen key to keep those moves silent — one less thing to break the flow.",
         featCurveT: "Pressure that fits your hand",
         featCurveP: "Pick a preset, then fine-tune with a full Bézier curve editor — remembered per tool.",
         featToolsT: "Four tools",
         featToolsP: "Pencil, fountain pen, crayon, marker — and it can stay active only in the apps you choose.",
-        mockToolSettings: "Tool Settings — Pencil",
-        mockStandard: "Standard",
+        mockToolSettings: "Tool Settings",
+        mockToolPencil: "Pencil", mockToolFountain: "Fountain pen", mockToolCrayon: "Crayon", mockToolMarker: "Marker",
+        pressSoft: "Soft", pressStandard: "Standard", pressFirm: "Firm",
         hushCue: "Quiet while held",
         secDownload: "03 — Download",
         // ⬇︎ price — priceEarly / priceReg
@@ -598,6 +696,8 @@
       document.querySelectorAll(".lang-toggle button").forEach((b) => {
         b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
       });
+      // JS가 직접 그리는 라벨(목업 도구 이름·필압 프리셋)도 갱신되도록 알림
+      document.dispatchEvent(new CustomEvent("ffiblab:langchange"));
       try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
     }
     document.querySelectorAll(".lang-toggle button").forEach((b) => {
@@ -617,6 +717,7 @@
       const placeholder = document.getElementById("demoPlaceholder");
       const screen = document.querySelector(".paper-screen");
       const clearBtn = document.getElementById("demoClear");
+      const soundChip = document.getElementById("demoSound");
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       let ctx2d = null, W = 0, H = 0;
 
@@ -634,6 +735,8 @@
       window.addEventListener("resize", fitCanvas);
 
       let ac = null;              // AudioContext (첫 제스처에서 생성 — 자동재생 정책)
+      let masterGain = null;      // 데모 전체 볼륨 — 배경음답게, 통상적인 음악 재생보다 작게
+      const DEMO_MASTER = 0.4;
       let currentTool = "pen";
       const bufferCache = {};     // { tool: {slow,mid,fast,taps:[...]}}
       let voices = null;          // {slow:{src,gain}, ...}
@@ -644,10 +747,35 @@
       // 📱 모바일(iOS 등): 오디오 출력은 사용자 제스처 '안에서' 동기적으로 한 번 울려야 열린다.
       // decodeAudioData(비동기) 뒤에 첫 소리를 내면 이미 제스처 밖이라 무음 처리되므로,
       // 여기서 1-프레임 무음 버퍼를 즉시 재생해 컨텍스트를 강제로 깨운다.
+      // ?audiodebug=1 — 모바일에서 컨텍스트 상태를 눈으로 확인하기 위한 임시 배지
+      const dbgEl = /[?&]audiodebug=1/.test(location.search) ? (() => {
+        const el = document.createElement("div");
+        el.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:99;background:#000;color:#0f0;font:11px monospace;padding:4px 8px;pointer-events:none;";
+        document.body.appendChild(el);
+        return el;
+      })() : null;
+      const dbg = (m) => { if (dbgEl) dbgEl.textContent = m + (ac ? " | " + ac.state : " | no-ctx"); };
+
       function unlockAudio() {
-        if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-        if (ac.state === "suspended") ac.resume();
-        if (audioUnlocked) return;
+        if (!ac) {
+          ac = new (window.AudioContext || window.webkitAudioContext)();
+          masterGain = ac.createGain();
+          masterGain.gain.value = DEMO_MASTER;
+          masterGain.connect(ac.destination);
+          // 잠금이 풀리는 순간 — 아직 그리는 중이면 그 자리에서 바로 소리 시작
+          ac.onstatechange = () => {
+            dbg("statechange");
+            if (ac.state === "running" && drawing && !voices) startVoices();
+            updateSoundChip();
+          };
+        }
+        // suspended뿐 아니라 iOS 특유의 interrupted 상태도 커버.
+        // 유효 제스처 밖이면 resume이 조용히 거부될 수 있어 매 제스처마다 다시 부른다.
+        if (ac.state !== "running") {
+          const p = ac.resume();
+          if (p && p.catch) p.catch(() => {});
+        }
+        if (audioUnlocked && ac.state === "running") return;
         try {
           const b = ac.createBuffer(1, 1, 22050);
           const s = ac.createBufferSource();
@@ -657,6 +785,18 @@
           audioUnlocked = true;
         } catch (e) {}
       }
+
+      // iOS 사파리는 pointerdown(터치 시작) 제스처로는 컨텍스트를 안 풀어주는 경우가 있다.
+      // (도구 버튼부터 소리가 났던 이유 — click은 touchend 이후라 통과)
+      // 그래서 아무 곳이든 손을 떼는 순간마다 재시도하고, 실제 running이 되면 물러난다.
+      function retryUnlock() {
+        unlockAudio();
+        dbg("retry-unlock");
+        if (ac && ac.state === "running") {
+          ["touchstart", "touchend", "pointerup", "click"].forEach((ev) => document.removeEventListener(ev, retryUnlock, true));
+        }
+      }
+      ["touchstart", "touchend", "pointerup", "click"].forEach((ev) => document.addEventListener(ev, retryUnlock, true));
 
       // ⚠️ file://로 직접 열면 브라우저가 fetch를 차단해 소리가 안 남 — http(s)로 확인할 것
       if (location.protocol === "file:") {
@@ -676,6 +816,7 @@
           return entry;
         } catch (err) {
           console.warn("[PenSound demo] 오디오 로드 실패 — 잉크만 동작합니다:", err);
+          dbg("load-fail " + (err && err.name));
           return null;
         }
       }
@@ -702,7 +843,7 @@
           src.loopEnd = bufs[k].duration;
           const gain = ac.createGain();
           gain.gain.value = 0;
-          src.connect(gain).connect(ac.destination);
+          src.connect(gain).connect(masterGain);
           src.start(0, Math.random() * bufs[k].duration);   // 위상 랜덤 — 반복감 방지
           voices[k] = { src, gain };
         }
@@ -729,7 +870,7 @@
         src.buffer = bufs.taps[1 + Math.floor(Math.random() * 2)];  // 중간 필압 탭
         const g = ac.createGain();
         g.gain.value = 0.9;
-        src.connect(g).connect(ac.destination);
+        src.connect(g).connect(masterGain);
         src.start();
       }
 
@@ -795,9 +936,11 @@
         drawing = true;
         lastPt = pt(e); lastT = performance.now(); speedEma = 0;
         placeholder.style.opacity = "0";
+        dbg("pointerdown");
         await loadTool(currentTool);
         playTap();
-        startVoices();
+        await startVoices();
+        dbg("voices " + (voices ? "on" : "off"));
       });
 
       canvas.addEventListener("pointermove", (e) => {
@@ -813,6 +956,11 @@
         updateGains();
       });
 
+      // 잠긴 채 획이 끝났으면 칩 표시 — 탭(click)은 iOS에서 확실히 잠금을 푼다
+      function updateSoundChip() {
+        soundChip.hidden = !(ac && ac.state !== "running");
+      }
+
       function end() {
         if (!drawing) return;
         drawing = false;
@@ -823,6 +971,7 @@
           const v = voices; voices = null;
           setTimeout(() => { try { for (const k of ["slow","mid","fast"]) v[k].src.stop(); } catch (e) {} }, 500);
         }
+        updateSoundChip();
       }
       canvas.addEventListener("pointerup", end);
       canvas.addEventListener("pointercancel", end);
@@ -833,6 +982,14 @@
         ctx2d.clearRect(0, 0, W, H);
         screen.classList.remove("has-ink");
         placeholder.style.opacity = "1";
+      });
+
+      soundChip.addEventListener("click", async () => {
+        unlockAudio();   // click 제스처 안 — 여기서의 resume은 iOS에서도 통과한다
+        dbg("chip-click");
+        await loadTool(currentTool);
+        if (ac && ac.state === "running") { playTap(); updateSoundChip(); }
+        // 아직 suspended면 statechange가 러닝 전환 시점에 칩을 숨긴다
       });
 
       // 무소식 감쇠 (이벤트가 안 오면 속도 하강 — 앱과 같은 원리)
@@ -869,6 +1026,10 @@
       const navEl = document.querySelector("header");
       const secHeadEl = document.querySelector("#palette .sec-head");
       const press = document.getElementById("mockPress");
+      const pressVal = document.getElementById("mockPressVal");
+      const curveFill = document.getElementById("mockCurve");
+      const curveVal = document.getElementById("mockCurveVal");
+      const toolName = document.getElementById("mockToolName");
 
       // 고정 헤더/섹션헤드 높이를 실측해 CSS 변수로 — 목업 sticky top 계산에 사용
       function setStickyVars() {
@@ -880,28 +1041,103 @@
       const tools = document.querySelectorAll("#mockTools .mock-tool");
       const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+      /* 목업 설정값의 단일 소스 — 슬라이더 폭과 라벨은 항상 여기서 함께 그린다 */
+      const tr = (key) => (STRINGS[document.documentElement.lang] || STRINGS.en)[key] || "";
+      const PRESS_PRESETS = { soft: { w: 32, key: "pressSoft" }, std: { w: 50, key: "pressStandard" }, firm: { w: 74, key: "pressFirm" } };
+      // 순서 = 목업 아이콘 순서 (연필 · 만년필 · 크레용 · 마커)
+      const MOCK_TOOLS = [
+        { nameKey: "mockToolPencil",   press: "std",  curve: 0 },
+        { nameKey: "mockToolFountain", press: "soft", curve: 18 },
+        { nameKey: "mockToolCrayon",   press: "firm", curve: -14 },
+        { nameKey: "mockToolMarker",   press: "std",  curve: 32 },
+      ];
+      let toolIdx = 0;
+
+      function setPress(preset) {
+        press.style.width = PRESS_PRESETS[preset].w + "%";
+        pressVal.textContent = tr(PRESS_PRESETS[preset].key);
+      }
+      // 커브는 중앙(0) 기준 양방향 게이지 — 0%면 눈금만 남는다
+      function setCurve(v) {
+        const half = Math.abs(v) / 2;
+        curveFill.style.left = (v >= 0 ? 50 : 50 - half) + "%";
+        curveFill.style.width = half + "%";
+        curveFill.style.borderRadius = v >= 0 ? "0 11px 11px 0" : "11px 0 0 11px";
+        curveVal.textContent = (v > 0 ? "+" : "") + v + "%";
+      }
+      function applyMockTool(i) {
+        toolIdx = i;
+        const t = MOCK_TOOLS[i];
+        tools.forEach((el, j) => el.classList.toggle("sel", j === i));
+        toolName.textContent = tr(t.nameKey);
+        setPress(t.press);
+        setCurve(t.curve);
+      }
+
       let toolTimer = null, pressTimer = null;
       function clearTimers() { clearInterval(toolTimer); clearInterval(pressTimer); toolTimer = pressTimer = null; }
 
+      /* ── 메뉴바 클릭 인트로 (1회성 연출) ──
+         목업이 화면에 들어오면: 커서가 앱 아이콘으로 이동 → 눌림 → 팔레트가 드롭.
+         설명(feat)이 먼저 활성화되면 즉시 완료 상태로 점프해 하이라이트가 어긋나지 않게 한다. */
+      const scene = document.querySelector("#palette .mock-scene");
+      const mbApp = document.getElementById("mbApp");
+      const cursor = document.getElementById("mockCursor");
+      const clockEl = document.getElementById("mbClock");
+      if (clockEl) {
+        const now = new Date();
+        clockEl.textContent = now.toLocaleDateString("en-US", { weekday: "short" }) + " " +
+          now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+      }
+      let introTimers = [], introDone = false, introPlaying = false;
+      function clearIntroTimers() { introTimers.forEach(clearTimeout); introTimers = []; }
+      function finishIntro() {
+        if (introDone && !introPlaying) return;
+        clearIntroTimers();
+        introPlaying = false; introDone = true;
+        scene.classList.add("is-open", "mb-pressed");
+        scene.classList.remove("cursor-visible");
+      }
+      function playIntro() {
+        if (introPlaying || introDone) return;
+        if (reduce) { finishIntro(); return; }
+        introPlaying = true;
+        const s = scene.getBoundingClientRect();
+        const i = mbApp.getBoundingClientRect();
+        const tx = i.left - s.left + i.width / 2 - 5;   // 커서 끝점 보정
+        const ty = i.top - s.top + i.height / 2 - 3;
+        cursor.style.transition = "none";
+        cursor.style.transform = `translate(${s.width * 0.55}px, 230px)`;
+        scene.classList.add("cursor-visible");
+        const at = (ms, fn) => introTimers.push(setTimeout(fn, ms));
+        at(80,   () => { cursor.style.transition = ""; cursor.style.transform = `translate(${tx}px, ${ty}px)`; });
+        at(880,  () => { scene.classList.add("mb-pressed"); cursor.style.transform = `translate(${tx}px, ${ty}px) scale(0.82)`; });
+        at(1030, () => { cursor.style.transform = `translate(${tx}px, ${ty}px)`; scene.classList.add("is-open"); });
+        at(1650, () => { scene.classList.remove("cursor-visible"); introPlaying = false; introDone = true; });
+      }
+
       function activate(key) {
+        if (key) finishIntro();   // 설명이 켜지는 순간엔 팔레트가 반드시 열려 있어야 한다
         clearTimers();
         mock.classList.remove("focus-tools", "focus-curve", "focus-mute", "is-focusing");
+        applyMockTool(toolIdx);   // 애니메이션이 흔든 값 → 선택된 도구의 저장값으로 복원
         feats.forEach((f) => f.classList.toggle("is-active", f.dataset.feat === key));
         featsWrap.classList.toggle("has-active", !!key);
         if (!key) return;
         if (key === "tools") {
           mock.classList.add("focus-tools", "is-focusing");
           if (!reduce) {
-            let i = 0;
-            const step = () => { tools.forEach((t) => t.classList.remove("sel")); i = (i + 1) % tools.length; tools[i].classList.add("sel"); };
+            // 도구가 바뀌면 그 도구의 설정값(이름·감도·커브)도 함께 바뀐다
+            const step = () => applyMockTool((toolIdx + 1) % MOCK_TOOLS.length);
             step();
             toolTimer = setInterval(step, 950);
           }
         } else if (key === "curve") {
           mock.classList.add("focus-curve", "is-focusing");
           if (!reduce) {
+            // 감도만 움직인다 — 피치까지 같이 흔들면 산만해서 도구 저장값 그대로 둠
             let hi = true;
-            const step = () => { press.style.width = (hi ? 74 : 32) + "%"; hi = !hi; };
+            const step = () => { setPress(hi ? "firm" : "soft"); hi = !hi; };
             step();
             pressTimer = setInterval(step, 900);
           }
@@ -912,15 +1148,32 @@
 
       // 활성화 기준선: 데스크톱은 뷰포트 중앙, 모바일은 고정된 목업 바로 아래
       // (읽고 있는 설명이 목업 밑으로 들어가기 직전에 켜지도록)
+      const viewH = () => window.innerHeight || document.documentElement.clientHeight;
       function triggerY() {
         if (isMobile() && mockStage) {
           // 목업 아래 '읽는 영역'의 한가운데를 기준선으로 — 지금 읽는 설명이 활성화되도록
           const r = mockStage.getBoundingClientRect();
-          return (r.bottom + window.innerHeight) / 2;
+          return (r.bottom + viewH()) / 2;
         }
-        return window.innerHeight / 2;
+        return viewH() / 2;
       }
       let currentKey = null;
+      // 목업 노출도에 따라 인트로 재생/초기화 — 스크롤 핸들러에서 함께 구동
+      // (IntersectionObserver는 일부 임베드 환경에서 발화하지 않아 rect 기반으로 통일)
+      function updateIntro() {
+        if (!scene || !mockStage) return;
+        const r = mockStage.getBoundingClientRect();
+        const vh = viewH();
+        const inView = r.top < vh * 0.8 && r.bottom > vh * 0.1;
+        const fullyOut = r.bottom < 0 || r.top > vh;
+        if (inView && currentKey === null) {
+          if (!introDone && !introPlaying) playIntro();
+        } else if (fullyOut && currentKey === null && !introPlaying && introDone) {
+          // 완전히 벗어나면 닫아 두었다가 다음 진입 때 다시 연출
+          introDone = false;
+          scene.classList.remove("is-open", "mb-pressed", "cursor-visible");
+        }
+      }
       function update() {
         const line = triggerY();
         let best = null;
@@ -928,15 +1181,20 @@
           const r = f.getBoundingClientRect();
           if (r.top < line && r.bottom > line) { best = f; break; }
         }
-        if (best && best.dataset.feat !== currentKey) { currentKey = best.dataset.feat; activate(currentKey); }
+        // 기준선이 어떤 설명 위에도 없으면 전부 해제 —
+        // 홀드 뮤트 오버레이가 해당 문구를 읽을 때만 목업 위에 뜨도록
+        const key = best ? best.dataset.feat : null;
+        if (key !== currentKey) { currentKey = key; activate(key); }
+        updateIntro();
       }
       window.addEventListener("scroll", update, { passive: true });
       window.addEventListener("resize", () => { setStickyVars(); update(); });
       window.addEventListener("load", () => { setStickyVars(); update(); });
+      document.addEventListener("ffiblab:langchange", () => applyMockTool(toolIdx));
       setStickyVars();
-      currentKey = feats[0].dataset.feat;
-      activate(currentKey);   // 초기 상태
+      applyMockTool(0);   // 초기 목업 = 연필 설정
       update();
+      window.__psIntro = { play: playIntro, finish: finishIntro };   // 디버깅용
       // 폰트 로딩 등으로 헤더 높이가 바뀔 수 있어 한 번 더 실측
       requestAnimationFrame(setStickyVars);
     })();
