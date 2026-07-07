@@ -1,0 +1,5 @@
+# 마케팅/스토어 자산 — 사이트에 배포하지 않음 (PenSound web/에서 이관, 로컬 보관용)
+marketing/
+
+# macOS
+.DS_Store
