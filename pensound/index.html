@@ -241,9 +241,15 @@
       content: ""; position: absolute; left: calc(50% - 0.5px); top: 5px; bottom: 5px;
       width: 1px; background: rgba(0,0,0,0.25);
     }
-    .mock-cap .fill.fill-curve {
+    /* 양수·음수 fill을 중앙에 각각 고정하고 width만 움직인다 —
+       한 장으로 left까지 옮기면 부호가 바뀔 때 블록이 중앙을 가로질러 미끄러진다 */
+    .mock-cap .fill.fill-curve-pos {
+      left: 50%;
       border-radius: 0 11px 11px 0;   /* 바깥쪽만 트랙 곡률로 둥글게 — 중앙(0점)은 눈금에 붙는 평면 */
-      transition: width 900ms ease-in-out, left 900ms ease-in-out;
+    }
+    .mock-cap .fill.fill-curve-neg {
+      left: auto; right: 50%;
+      border-radius: 11px 0 0 11px;
     }
     .mock-tools { display: flex; justify-content: space-between; padding: 6px 4px; }
     .mock-tool { width: 40px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #3a4046; transition: background 300ms, color 300ms; }
@@ -253,7 +259,8 @@
 
     /* ── 03 설명 ↔ 목업 연동 (스크롤에 따라 고정 목업이 반응) ── */
     .mock { position: relative; }                 /* hush-cue 앵커 */
-    .mock-stage { position: sticky; top: calc(50vh - 195px); align-self: start; }  /* 메뉴바만큼 커진 높이 반영 */
+    /* 스테이지 실측 높이(--stage-h, JS가 채움) 기준 뷰포트 세로 중앙 — 낮은 화면에선 위 여백 20px 확보 */
+    .mock-stage { position: sticky; top: max(20px, calc((100vh - var(--stage-h, 430px)) / 2)); align-self: start; }
     .feat { transition: opacity 200ms linear; }
     .feat[data-feat] { outline: none; }
     .feat b { transition: color 150ms linear; }
@@ -289,20 +296,30 @@
        화면 위쪽에 섹션 헤드 고정 → 그 아래 목업 고정 → 설명 텍스트는 목업 뒤로
        스크롤되며 사라진다. --nav-h / --sec-h 는 JS가 실측해 채운다. */
     @media (max-width: 900px) {
+      /* 제목-목업 사이 숨 쉬는 간격 — 뷰포트 가로·세로에 비례 (작은 폰은 좁게, 큰 폰·태블릿은 넉넉히) */
+      #palette { --pal-gap: clamp(12px, 2vh + 1.2vw, 44px); }
       /* 섹션 헤드(02 — 팔레트)를 메인 네비 바로 아래에 고정 */
       #palette .sec-head {
         position: sticky;
         top: var(--nav-h, 92px);
         z-index: 6;
-        margin-bottom: 20px;
-        padding: 12px 0;
+        margin-bottom: var(--pal-gap);
+        padding: clamp(10px, 1.5vh, 18px) 0;
         background: rgba(255,255,255,0.94);
         backdrop-filter: blur(12px);
       }
-      /* 목업 스테이지를 섹션 헤드 아래에 고정 + 텍스트보다 위로(z) 올려 뒤로 지나가게 */
+      /* 제목-목업 간격의 가림막 — sticky로 겹칠 때 그 틈으로 지나가는 텍스트를 숨긴다 */
+      #palette .sec-head::after {
+        content: "";
+        position: absolute; left: 0; right: 0; top: 100%;
+        height: var(--pal-gap);
+        background: var(--bg);
+        pointer-events: none;
+      }
+      /* 목업 스테이지를 섹션 헤드 아래(간격만큼 띄워)에 고정 + 텍스트보다 위로(z) 올려 뒤로 지나가게 */
       #palette .mock-stage {
         position: sticky;
-        top: calc(var(--nav-h, 92px) + var(--sec-h, 64px));
+        top: calc(var(--nav-h, 92px) + var(--sec-h, 64px) + var(--pal-gap));
         z-index: 5;
         padding: 16px;
       }
@@ -394,7 +411,7 @@
             <canvas id="demoCanvas" aria-label="Sound demo canvas"></canvas>
             <div class="placeholder" id="demoPlaceholder" data-i18n="demoPlaceholder"></div>
             <button class="paper-clear" id="demoClear" type="button" data-i18n="clearLabel"></button>
-            <!-- iOS: 드래그 제스처로는 오디오 잠금이 안 풀린다 — 첫 획이 무음이면 탭 한 번을 유도 -->
+            <!-- iOS: 드래그 제스처로는 오디오 잠금이 안 풀린다 — 터치 기기에선 처음부터 표시해 첫 획 전에 탭을 유도 -->
             <button class="paper-sound" id="demoSound" type="button" hidden>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4z" fill="currentColor" stroke="none"/><path d="M16.5 9.5a4 4 0 0 1 0 5"/><path d="M18.8 7.2a7.2 7.2 0 0 1 0 9.6"/></svg>
               <span data-i18n="soundChip"></span>
@@ -516,7 +533,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v8.1M9.2 10.2L12 13.4l2.8-3.2M4.5 17.5h15"/></svg>
                     <span class="val" id="mockPressVal"></span>
                   </div>
-                  <div class="mock-cap cap-center"><div class="fill fill-curve" id="mockCurve" style="left:50%; width:0;"></div>
+                  <div class="mock-cap cap-center"><div class="fill fill-curve-pos" id="mockCurvePos" style="width:0"></div><div class="fill fill-curve-neg" id="mockCurveNeg" style="width:0"></div>
                     <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.9" stroke-linecap="round"><path d="M3 12c1.8-6.4 4.4-6.4 6.2 0 1.4 4.8 3.2 4.8 4.6 0 1.1-3.6 2.3-3.6 3.4 0 .8 2.6 1.7 2.6 2.5 0"/></svg>
                     <span class="val" id="mockCurveVal">0%</span>
                   </div>
@@ -956,10 +973,13 @@
         updateGains();
       });
 
-      // 잠긴 채 획이 끝났으면 칩 표시 — 탭(click)은 iOS에서 확실히 잠금을 푼다
+      // 터치 기기는 첫 획이 무음이 되기 쉬우니(iOS: 드래그로는 잠금 해제 안 됨) 처음부터 칩 표시.
+      // 오디오가 실제로 running이 되면 숨긴다 — 탭(click)은 iOS에서 확실히 잠금을 푼다.
+      const coarsePointer = matchMedia("(pointer: coarse)").matches;
       function updateSoundChip() {
-        soundChip.hidden = !(ac && ac.state !== "running");
+        soundChip.hidden = ac ? ac.state === "running" : !coarsePointer;
       }
+      updateSoundChip();
 
       function end() {
         if (!drawing) return;
@@ -1027,15 +1047,17 @@
       const secHeadEl = document.querySelector("#palette .sec-head");
       const press = document.getElementById("mockPress");
       const pressVal = document.getElementById("mockPressVal");
-      const curveFill = document.getElementById("mockCurve");
+      const curvePos = document.getElementById("mockCurvePos");
+      const curveNeg = document.getElementById("mockCurveNeg");
       const curveVal = document.getElementById("mockCurveVal");
       const toolName = document.getElementById("mockToolName");
 
-      // 고정 헤더/섹션헤드 높이를 실측해 CSS 변수로 — 목업 sticky top 계산에 사용
+      // 고정 헤더/섹션헤드/목업 스테이지 높이를 실측해 CSS 변수로 — 목업 sticky top 계산에 사용
       function setStickyVars() {
         const root = document.documentElement.style;
         if (navEl) root.setProperty("--nav-h", Math.round(navEl.getBoundingClientRect().height) + "px");
         if (secHeadEl) root.setProperty("--sec-h", Math.round(secHeadEl.getBoundingClientRect().height) + "px");
+        if (mockStage) root.setProperty("--stage-h", Math.round(mockStage.getBoundingClientRect().height) + "px");
       }
       const isMobile = () => matchMedia("(max-width: 900px)").matches;
       const tools = document.querySelectorAll("#mockTools .mock-tool");
@@ -1059,10 +1081,8 @@
       }
       // 커브는 중앙(0) 기준 양방향 게이지 — 0%면 눈금만 남는다
       function setCurve(v) {
-        const half = Math.abs(v) / 2;
-        curveFill.style.left = (v >= 0 ? 50 : 50 - half) + "%";
-        curveFill.style.width = half + "%";
-        curveFill.style.borderRadius = v >= 0 ? "0 11px 11px 0" : "11px 0 0 11px";
+        curvePos.style.width = (v > 0 ? v / 2 : 0) + "%";
+        curveNeg.style.width = (v < 0 ? -v / 2 : 0) + "%";
         curveVal.textContent = (v > 0 ? "+" : "") + v + "%";
       }
       function applyMockTool(i) {
