@@ -107,10 +107,18 @@
       background: var(--accent-bright);
       right: -14%; bottom: -14%;
     }
+    /* 세로줄·가로줄이 (22%, 56%)에서 만나 모서리를 이룬다 —
+       큰 사각형의 왼쪽 위에 작은 사각형이 겹치는 구도이자, 소문자 f */
     .hero-geo .ln {
       position: absolute;
       left: 22%; top: -12%;
-      width: var(--line-thick); height: 60%;
+      width: var(--line-thick); height: calc(68% + var(--line-thick));
+      background: var(--border);
+    }
+    .hero-geo .ln-h {
+      position: absolute;
+      left: -12%; top: 56%;
+      width: calc(34% + var(--line-thick)); height: var(--line-thick);
       background: var(--border);
     }
 
@@ -238,6 +246,7 @@
       <div class="hero-geo" aria-hidden="true">
         <div class="sq"></div>
         <div class="ln"></div>
+        <div class="ln-h"></div>
         <div class="ci"></div>
       </div>
     </div>
