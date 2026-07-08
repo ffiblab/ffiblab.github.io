@@ -107,18 +107,19 @@
       background: var(--accent-bright);
       right: -14%; bottom: -14%;
     }
-    /* 세로줄·가로줄이 (22%, 56%)에서 만나 모서리를 이룬다 —
-       큰 사각형의 왼쪽 위에 작은 사각형이 겹치는 구도이자, 소문자 f */
+    /* 두 획이 (62%, 38%)에서 만나 가로로 긴 내부 사각형을 이루고, 그 모서리가 파란 원 위를 지난다.
+       읽기: 왼쪽 모서리+가로획 = f, 세로획+가로획 = f, 세로획 = i, 세로획+원 = b → ffib
+       (블라인드 10표 중 5표로 선정된 비례) */
     .hero-geo .ln {
       position: absolute;
-      left: 22%; top: -12%;
-      width: var(--line-thick); height: calc(68% + var(--line-thick));
+      left: 62%; top: -12%;
+      width: var(--line-thick); height: calc(50% + var(--line-thick));
       background: var(--border);
     }
     .hero-geo .ln-h {
       position: absolute;
-      left: -12%; top: 56%;
-      width: calc(34% + var(--line-thick)); height: var(--line-thick);
+      left: -12%; top: 38%;
+      width: calc(74% + var(--line-thick)); height: var(--line-thick);
       background: var(--border);
     }
 
