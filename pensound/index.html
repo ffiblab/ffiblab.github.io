@@ -602,8 +602,8 @@
               <span class="price-after" data-i18n="priceAfter"></span>
               <span class="price-beta" data-i18n="priceBetaHold"></span>
             </div>
-            <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaMac"></a>
-            <a class="btn btn--ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaWin"></a>
+            <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaMac" data-i18n-href="dlCtaHref"></a>
+            <a class="btn btn--ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaWin" data-i18n-href="dlCtaHref"></a>
             <span class="win" data-i18n="dlBeta"></span>
           </div>
         </div>
@@ -673,6 +673,8 @@
         dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔<br />Windows 10·11 · 64비트<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
         dlCtaMac: "macOS용 다운로드",
         dlCtaWin: "Windows용 다운로드",
+        // 베타 기간 = 두 버튼 모두 신청 폼으로 간다(판매 보류). 언어별 폼 = 배너와 같은 규약.
+        dlCtaHref: "https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform",
         dlBeta: "지금 macOS·Windows 모두 베타 테스터 모집 중 →",
         // 프라이버시 고지 — 정본: docs/release/beta-ops-runbook.md §2-2 (문장 그대로, 순서만 조정)
         dlPrivacy: "앱이 스스로 무언가를 보내는 일은 없습니다. 붙여넣어 제출한 것만 전달됩니다. 필기·그림 내용, 화면, 눌린 키 기록 — 앱은 이런 것을 저장하거나 보내지 않습니다.",
@@ -729,6 +731,8 @@
         dlMeta: "macOS 13+ · Apple Silicon & Intel<br />Windows 10·11 · 64-bit<br />One license for both Windows & macOS — up to 2 devices, mix freely",
         dlCtaMac: "Download for macOS",
         dlCtaWin: "Download for Windows",
+        // 영문 신청 폼 — 정본: PenSound docs/beta/google-forms-en.md §생성 (배너 betaRibbonHref와 동일 값)
+        dlCtaHref: "https://docs.google.com/forms/d/e/1FAIpQLSfpuWfjoc4ePxHmOKxb0I-H0N4fiPyH7xN9FsIRMxK1ZQbWSg/viewform",
         dlBeta: "macOS & Windows beta — now looking for testers →",
         // 첫 문장 = 정본 영문(beta-ops-runbook §2-1). 둘째 문장은 §2-2 국문의 초벌 번역 — 사장 확인 필요
         dlPrivacy: "Nothing is sent automatically — only what you paste and submit. What you draw, your screen, and your keystrokes are never stored or sent.",
