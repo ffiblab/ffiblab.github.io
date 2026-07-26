@@ -28,6 +28,18 @@
   <style>
     .frame { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
 
+    /* ── 베타 리본 (모집 기간 한정 — 모집 종료 시 이 블록과 <a class="beta-ribbon"> 한 줄만 지우면 원상 복구) ──
+       sticky 헤더 '위'에 두고 스크롤과 함께 흘려보낸다 → header의 top:0·JS의 --nav-h 실측이 그대로 유효 */
+    .beta-ribbon {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 38px; padding: 8px 20px;
+      background: var(--accent); color: #fff;
+      font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em; line-height: 1.4;
+      text-align: center; text-decoration: none;
+    }
+    .beta-ribbon:hover { background: var(--fg); }
+    .beta-ribbon:focus-visible { outline: 2px solid var(--fg); outline-offset: -4px; }
+
     /* ── 네비 ── */
     header { border-bottom: var(--line) solid var(--border); position: sticky; top: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); z-index: 20; }
     .nav { display: flex; align-items: center; gap: 18px; padding-top: 14px; padding-bottom: 14px; }
@@ -362,6 +374,11 @@
     .price-was s { font-variant-numeric: tabular-nums; }
     .price-note { font-size: 12px; font-weight: 600; color: rgba(0,0,0,0.6); }
     .price-after { font-size: 11px; font-weight: 600; color: var(--accent); }
+    .price-beta { font-size: 11px; font-weight: 600; margin-top: 6px; opacity: .72; }
+    /* 프라이버시 고지 (베타 운영 런북 §2-2 — 다운로드 절 반영처) */
+    .dl-privacy { margin-top: 18px; max-width: 560px; font-size: 12.5px; font-weight: 500; line-height: 1.7; color: rgba(0,0,0,0.55); }
+    .dl-privacy a { color: var(--accent); font-weight: 700; text-decoration: none; }
+    .dl-privacy a:hover { text-decoration: underline; }
 
     /* ── 푸터 ── */
     footer { border-top: var(--line) solid var(--border); font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.5); }
@@ -372,6 +389,8 @@
   </style>
 </head>
 <body class="tx-noise">
+  <!-- 베타 리본 — 모집 기간(2026-07-27 ~ 08-14) 한정. 종료 시 이 한 줄 삭제 -->
+  <a class="beta-ribbon" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="betaRibbon"></a>
   <header>
     <div class="frame nav">
       <a class="nav-mark" href="./">PenSound<span>.</span></a>
@@ -568,6 +587,7 @@
           <div>
             <h2 class="dl-title" data-i18n-html="dlTitle"></h2>
             <p class="dl-meta" data-i18n-html="dlMeta"></p>
+            <p class="dl-privacy"><span data-i18n="dlPrivacy"></span> <a href="../privacy/" data-i18n="dlPrivacyMore"></a></p>
           </div>
           <div class="dl-cta">
             <div class="price">
@@ -579,6 +599,7 @@
               <span class="price-note" data-i18n="priceNote"></span>
               <span class="price-note" data-i18n="priceFx"></span>
               <span class="price-after" data-i18n="priceAfter"></span>
+              <span class="price-beta" data-i18n="priceBetaHold"></span>
             </div>
             <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaMac"></a>
             <a class="btn btn--ghost" href="https://docs.google.com/forms/d/e/1FAIpQLSf0Q5GI7epxOsHNUSaeUZ9_XQeYT4JJh8jyW2a-6O1yycv4Ug/viewform" target="_blank" rel="noopener" data-i18n="dlCtaWin"></a>
@@ -604,6 +625,8 @@
     /* ══════════ i18n ══════════ */
     const STRINGS = {
       ko: {
+        // 베타 리본 — 정본: docs/beta/recruit-copy.md §C (모집 종료 시 리본 마크업과 함께 제거)
+        betaRibbon: "🧪 베타 테스터 모집 중 — 참여하고 정식 라이선스 받아가세요",
         navDownload: "다운로드",
         heroTitle: "모든 획에,<br />소리를<span class='dot'>.</span>",
         heroLede: "타블렛으로 바꾸면서 사라진 펜 소리를 되살려요. 속도·필압·종이결을 따라 매 순간 새로 만들어 내는 소리예요.",
@@ -643,14 +666,20 @@
         priceNote: "한 번 구매 · 구독 없음 · 평생 업데이트",
         priceFx: "미국 달러로 결제되며, 원화 금액은 환율에 따라 달라져요",
         priceAfter: "정식 출시 후 정가로 인상돼요",
+        priceBetaHold: "베타 기간에는 판매하지 않아요 — 베타가 끝나면 이 가격으로 열려요",
         dlTitle: "14일 동안,<br />무료로 들어보세요<span class='dot'>.</span>",
         dlMeta: "macOS 13 이상 · 애플 실리콘과 인텔<br />Windows 10·11 · 64비트<br />라이선스 1개로 Windows·macOS 모두 — 기기 2대까지 교차 사용 가능",
         dlCtaMac: "macOS용 다운로드",
         dlCtaWin: "Windows용 다운로드",
         dlBeta: "지금 macOS·Windows 모두 베타 테스터 모집 중 →",
+        // 프라이버시 고지 — 정본: docs/release/beta-ops-runbook.md §2-2 (문장 그대로, 순서만 조정)
+        dlPrivacy: "앱이 스스로 무언가를 보내는 일은 없습니다. 붙여넣어 제출한 것만 전달됩니다. 필기·그림 내용, 화면, 눌린 키 기록 — 앱은 이런 것을 저장하거나 보내지 않습니다.",
+        dlPrivacyMore: "개인정보 처리방침 보기 →",
         privacy: "개인정보 처리방침", refund: "환불 정책", contact: "문의",
       },
       en: {
+        // ⚠️ 영문 정본 없음 — 국문 정본(recruit-copy §C)의 초벌 번역. 사장 확인 필요
+        betaRibbon: "🧪 Beta testers wanted — join and get a full license",
         navDownload: "Download",
         heroTitle: "Every stroke,<br />a sound<span class='dot'>.</span>",
         heroLede: "Bring back the pen sounds your tablet took away — made new with every stroke, following your speed, pressure, and paper grain.",
@@ -690,11 +719,16 @@
         priceNote: "One-time purchase · No subscription · Free updates",
         priceFx: "",
         priceAfter: "Goes up to full price at launch",
+        // ⚠️ 영문 정본 없음 — Fable 검수 대기 (2026-07-26 반장 초안)
+        priceBetaHold: "Not for sale during the beta — purchasing opens when the beta ends",
         dlTitle: "Try it free<br />for 14 days<span class='dot'>.</span>",
         dlMeta: "macOS 13+ · Apple Silicon & Intel<br />Windows 10·11 · 64-bit<br />One license for both Windows & macOS — up to 2 devices, mix freely",
         dlCtaMac: "Download for macOS",
         dlCtaWin: "Download for Windows",
         dlBeta: "macOS & Windows beta — now looking for testers →",
+        // 첫 문장 = 정본 영문(beta-ops-runbook §2-1). 둘째 문장은 §2-2 국문의 초벌 번역 — 사장 확인 필요
+        dlPrivacy: "Nothing is sent automatically — only what you paste and submit. What you draw, your screen, and your keystrokes are never stored or sent.",
+        dlPrivacyMore: "Read the privacy policy →",
         privacy: "Privacy", refund: "Refund", contact: "Contact",
       },
     };
