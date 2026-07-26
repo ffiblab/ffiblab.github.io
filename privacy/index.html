@@ -7,18 +7,18 @@
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
-  <meta name="description" content="PenSound and ffiblab.com privacy policy — no tracking, no analytics, no personal data collected. Your tablet input stays on your device." />
+  <meta name="description" content="PenSound privacy policy — no tracking, no analytics. What you draw never leaves your device, and nothing is sent to us unless you send it." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://ffiblab.com/privacy/" />
   <meta property="og:title" content="Privacy Policy — PenSound" />
-  <meta property="og:description" content="No tracking, no analytics, no personal data collected." />
+  <meta property="og:description" content="No tracking, no analytics. What you draw never leaves your device." />
   <meta property="og:image" content="https://ffiblab.com/assets/og-pensound.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@ffiblab" />
   <meta name="twitter:title" content="Privacy Policy — PenSound" />
-  <meta name="twitter:description" content="No tracking, no analytics, no personal data collected." />
+  <meta name="twitter:description" content="No tracking, no analytics. What you draw never leaves your device." />
   <meta name="twitter:image" content="https://ffiblab.com/assets/og-pensound.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -47,6 +47,7 @@
     .prose .sec:first-child { border-top: none; padding-top: 0; }
     .prose h2 { font-size: 17px; font-weight: 900; letter-spacing: -0.01em; margin-bottom: 10px; }
     .prose p { font-size: 15px; font-weight: 500; line-height: 1.75; color: rgba(0,0,0,0.62); }
+    .prose p + p { margin-top: 10px; }
     .prose a { color: var(--accent); text-decoration: none; font-weight: 700; }
     .prose a:hover { text-decoration: underline; }
 
@@ -70,7 +71,7 @@
       <div class="frame">
         <span class="sec-label">Legal</span>
         <h1 class="display">Privacy Policy</h1>
-        <p class="updated">Last updated: March 2026</p>
+        <p class="updated">Last updated: July 2026</p>
       </div>
     </div>
 
@@ -78,30 +79,46 @@
       <div class="frame prose">
         <div class="sec">
           <h2>The short version</h2>
-          <p>PenSound does not collect, store, or share any personal data. We don't track you, we don't profile you, and we don't sell anything about you — because we don't have anything to sell.</p>
+          <p>What you write and draw never leaves your device. PenSound has no analytics, no telemetry, and no tracking of any kind — we have no idea how you use the app unless you tell us.</p>
+          <p>The app makes exactly two connections on its own — a license check and an update check — and both are listed below. Everything else we ever receive is something you typed into a form and submitted yourself.</p>
         </div>
-        <!-- ⚠️ 베타 기간 한정 절 — 정본: PenSound docs/release/beta-ops-runbook.md §2-2 (국문).
-             영문 정본이 없어 §2-1의 정본 문장 1개 + §2-2 직역으로 초벌 작성 — 사장 확인 필요.
-             베타 종료 후 이 절은 삭제한다. -->
+
+        <div class="sec">
+          <h2>What stays on your device</h2>
+          <p>PenSound reads tablet input — pressure, speed, tilt — to generate sound as you draw. That input is processed locally, in memory, and is never written to disk or transmitted. The same is true of your screen contents and your keystrokes: the app watches for the mute hotkey you configured, and nothing about your typing is stored or sent.</p>
+          <p>Your settings — tool profiles, volumes, calibration, and language — are stored only on your own machine.</p>
+        </div>
+
+        <!-- 자동 통신 절 — 앱의 자동 요청이 늘거나 줄면 이 절을 함께 고친다. -->
+        <div class="sec">
+          <h2>What the app sends on its own</h2>
+          <p><strong>License check.</strong> If you have activated a license, the app asks Lemon Squeezy whether that license is still valid — once at launch and roughly once a day after that. The request contains your license key and, if present, the activation instance id. Nothing else. If you have no license, or you are on the free trial, no license request is made at all.</p>
+          <p><strong>Update check.</strong> The app asks our release feed (<code>ffiblab.github.io/pensound-releases</code>) whether a newer version exists, and downloads the update if you accept it. Like any web request this tells the host — GitHub — your IP address and the app's version. No profile of your system is attached; Sparkle's system-profiling feature is switched off.</p>
+          <p>Both connections use HTTPS. Neither one carries anything you drew, typed, or configured.</p>
+        </div>
+
+        <!-- 베타 기간 한정 절 — 정본: PenSound 베타 운영 런북 §2-2 (국문).
+             베타 종료(2026-08-14) 후 이 절은 삭제한다. -->
         <div class="sec">
           <h2>Beta program (August 1–14, 2026)</h2>
           <p>During the PenSound beta we receive a little more than usual — and only through forms you fill in yourself.</p>
-          <p><strong>What we receive:</strong> the email address and device details you enter in the signup form; your answers to the feedback form; the diagnostic text the app prepares for you (app version, OS version, device model, locale, calibration values, license status); and, if you choose to paste one, a crash log.</p>
+          <p><strong>What we receive:</strong> the email address and device details you enter in the signup form; your answers to the feedback form; the diagnostic text the app prepares for you (app version, OS version, device model, language, screen calibration values, and whether you are on a trial or activated — never your license key); and, if you choose to paste one, a crash log.</p>
           <p><strong>What we never receive:</strong> what you write or draw, your screen, or your keystrokes — the app neither stores nor sends any of these.</p>
-          <p>Nothing is sent automatically — only what you paste and submit. Your email address is used solely for beta announcements and license delivery, and is deleted once the beta ends.</p>
+          <p>The app never submits any of this for you. Nothing is sent automatically — only what you paste and submit. Your email address is used solely for beta announcements and license delivery, and is deleted once the beta ends.</p>
         </div>
-        <div class="sec">
-          <h2>What we collect</h2>
-          <p>PenSound operates entirely on your device. The app reads tablet input (pressure, speed, tilt) locally to generate sound, and this data never leaves your Mac. The only information we process is what's strictly necessary to validate your license — handled securely through our payment processor, Lemon Squeezy.</p>
-        </div>
+
         <div class="sec">
           <h2>License validation</h2>
-          <p>When you activate PenSound with a license key, the key is verified against Lemon Squeezy's servers. No additional personal information is transmitted beyond what you provided at the time of purchase. Lemon Squeezy's privacy policy applies to that transaction and can be found at <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">lemonsqueezy.com/privacy</a>.</p>
+          <p>When you activate PenSound with a license key, the key is verified against Lemon Squeezy's servers. Two things are sent: the license key itself, and a name for the activation so that you can tell your devices apart in your license portal. That name is your computer's name as your operating system reports it — on many machines this includes the owner's name, so it is worth knowing that it leaves your device. It is used only to label the activation slot.</p>
+          <p>In return we receive the email address attached to the purchase, which the app stores locally so it can show who the license belongs to. Lemon Squeezy is our payment processor, and their privacy policy covers that transaction: <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener">lemonsqueezy.com/privacy</a>.</p>
         </div>
+
         <div class="sec">
           <h2>This website</h2>
-          <p>This website (ffiblab.com) is hosted on GitHub Pages and does not use cookies, analytics, or any tracking scripts. No data about your visit is collected or stored.</p>
+          <p>This website is hosted on GitHub Pages. We run no cookies, no analytics, and no tracking scripts, and we receive nothing about your visit.</p>
+          <p>Three companies do see the request your browser makes: GitHub, which serves the pages; Google Fonts and jsDelivr, which serve the typefaces. Serving a file means receiving your IP address and browser details, and each of those companies keeps its own logs under its own policy. We do not receive any of it. If you would rather not have your browser reach them at all, a content blocker will stop the font requests — the site is still readable without them.</p>
         </div>
+
         <div class="sec">
           <h2>Contact</h2>
           <p>If you have any questions about this policy, feel free to reach out at <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>.</p>
