@@ -93,7 +93,7 @@
         <div class="sec">
           <h2>What the app sends on its own</h2>
           <p><strong>License check.</strong> If you have activated a license, the app asks Lemon Squeezy whether that license is still valid — once at launch and roughly once a day after that. The request contains your license key and, if present, the activation instance id. Nothing else. If you have no license, or you are on the free trial, no license request is made at all.</p>
-          <p><strong>Update check.</strong> The app asks our release feed (<code>ffiblab.github.io/pensound-releases</code>) whether a newer version exists, and downloads the update if you accept it. Like any web request this tells the host — GitHub — your IP address and the app's version. No profile of your system is attached; Sparkle's system-profiling feature is switched off.</p>
+          <p><strong>Update check.</strong> The app asks our release feed (<code>ffiblab.github.io/pensound-releases</code>) whether a newer version exists — on macOS it downloads and installs the update if you accept, and on Windows it opens the download page for you. Like any web request this tells the host — GitHub — your IP address and the app's version. No profile of your system is attached; Sparkle's system-profiling feature is switched off.</p>
           <p>Both connections use HTTPS. Neither one carries anything you drew, typed, or configured.</p>
         </div>
 
