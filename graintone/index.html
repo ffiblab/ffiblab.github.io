@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Graintone</title>
+  <meta name="description" content="그리면, 소리가 난다. 펜 태블릿으로 그을 때 연필 소리가 손을 따라오는 앱. Draw, and hear it." />
+  <link rel="icon" type="image/svg+xml" href="appicon.svg" />
+  <link rel="stylesheet" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    /* Graintone 쪽은 앱의 모양을 따른다: 쿨그레이 타일, 먹색, 캡슐 버튼, 넓은 여백.
+       색은 앱 아이콘의 두 값(#E3E6EA, #22262C)에서 나온다. */
+    :root {
+      --ink: #22262C;
+      --ink-2: rgba(34, 38, 44, 0.64);
+      --ink-3: rgba(34, 38, 44, 0.44);
+      --paper: #F6F7F9;
+      --tile: #E3E6EA;
+      --hair: rgba(34, 38, 44, 0.12);
+      --button: #22262C;
+      --button-text: #FFFFFF;
+      --stroke: rgba(34, 38, 44, 0.78);
+      --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+              "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* 어두운 화면은 앱의 어두운 표면(#2E2E2E)과 같은 무채색으로 맞춘다. 쪽 < 타일 < 패널 순으로 밝다. */
+        --ink: #EDEDED;
+        --ink-2: rgba(237, 237, 237, 0.66);
+        --ink-3: rgba(237, 237, 237, 0.44);
+        --paper: #18181A;
+        --tile: #222223;
+        --hair: rgba(237, 237, 237, 0.14);
+        --button: #EDEDED;
+        --button-text: #18181A;
+        --stroke: rgba(237, 237, 237, 0.8);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      word-break: keep-all;
+    }
+    a { color: inherit; }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── 위 줄: 이름과 언어 ── */
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+    .lang { display: flex; gap: 4px; }
+    .lang button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--ink-3);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 44px;
+      min-height: 36px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .lang button[aria-pressed="true"] { color: var(--ink); background: var(--tile); }
+    .lang button:focus-visible, .pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    /* ── 첫 화면: 아이콘, 한 문장, 버튼 하나 ── */
+    .hero { text-align: center; padding: clamp(40px, 8vh, 96px) 0 clamp(40px, 7vh, 80px); }
+    .icon { width: 104px; height: 104px; display: block; margin: 0 auto; }
+    h1 {
+      margin-top: 20px;
+      font-size: clamp(40px, 6.4vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.08;
+    }
+    .lede {
+      margin: 20px auto 0;
+      max-width: 30em;
+      font-size: clamp(16px, 1.7vw, 19px);
+      line-height: 1.6;
+      color: var(--ink-2);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 24px;
+      border-radius: 999px;
+      background: var(--button);
+      color: var(--button-text);
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .pill--quiet { background: var(--tile); color: var(--ink); }
+    .pill--off { background: var(--tile); color: var(--ink-3); cursor: default; }
+    .hero .pill { margin-top: 32px; }
+    .note { margin-top: 14px; font-size: 13px; color: var(--ink-3); }
+
+    /* ── 종이: 그려 보는 자리가 될 타일. 패널은 그 위에 떠 있다 ── */
+    .sheet {
+      position: relative;
+      background: var(--tile);
+      border-radius: 36px;
+      min-height: 400px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 24px;
+      padding: 48px clamp(24px, 5vw, 64px);
+      overflow: hidden;
+    }
+    .sheet svg { width: 100%; height: auto; display: block; max-width: 520px; }
+    .sheet svg path { fill: none; stroke: var(--stroke); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .sheet-hint {
+      position: absolute;
+      left: clamp(24px, 5vw, 64px);
+      bottom: 28px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    /* 캡처(272×318pt)에서 패널 카드(224×270pt, 모서리 18)만 잘라 보인다 */
+    .panel {
+      width: 224px;
+      height: 270px;
+      border-radius: 18px;
+      overflow: hidden;
+      flex: none;
+    }
+    .panel img { width: 272px; height: 318px; margin: -24px 0 0 -24px; display: block; }
+
+    /* ── 얼리 액세스 ── */
+    .early { text-align: center; padding: clamp(64px, 12vh, 128px) 0; }
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .early p.body {
+      margin: 16px auto 0;
+      max-width: 28em;
+      font-size: clamp(16px, 1.7vw, 19px);
+      line-height: 1.6;
+      color: var(--ink-2);
+    }
+    .buy {
+      margin-top: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .price { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .price-note { font-size: 13px; color: var(--ink-3); }
+
+    footer { border-top: 1px solid var(--hair); }
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 24px;
+      padding-bottom: 40px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    .foot nav { display: flex; gap: 20px; flex-wrap: wrap; }
+    .foot a { text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+
+    @media (max-width: 720px) {
+      .sheet {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        border-radius: 28px;
+        padding: 40px 24px 64px;
+      }
+      .hero .pill { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap top">
+    <a class="name" href="./">Graintone</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
+      <button type="button" data-lang="en" aria-pressed="false">English</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <img class="icon" src="appicon.svg" alt="" width="104" height="104" />
+      <h1 data-i18n="heroTitle"></h1>
+      <p class="lede" data-i18n="heroLede"></p>
+      <!-- 출시 전: 내려받기와 구매를 막아 둔다(2026-10-08). 출시할 때 링크로 바꾼다. -->
+      <span class="pill pill--off" aria-disabled="true" data-i18n="soon"></span>
+      <p class="note" data-i18n="heroNote"></p>
+    </div>
+
+    <div class="sheet">
+      <svg viewBox="0 0 520 220" aria-hidden="true">
+        <!-- 연필로 빠르게 그은 빗금. 줄마다 길이·굵기·세기가 조금씩 다르다. -->
+        <path d="M44 178 Q 64 118 100 58" style="stroke-width:2.4;opacity:.92" />
+        <path d="M72 186 Q 98 116 138 46" style="stroke-width:2.1;opacity:.84" />
+        <path d="M108 180 Q 130 124 170 60" style="stroke-width:2.5;opacity:.95" />
+        <path d="M142 190 Q 170 122 210 44" style="stroke-width:2;opacity:.8" />
+        <path d="M180 178 Q 202 128 240 68" style="stroke-width:2.3;opacity:.9" />
+        <path d="M216 186 Q 242 126 284 52" style="stroke-width:1.9;opacity:.76" />
+        <path d="M254 176 Q 276 128 312 74" style="stroke-width:2.2;opacity:.86" />
+        <path d="M292 182 Q 314 134 352 80" style="stroke-width:1.8;opacity:.7" />
+        <path d="M330 172 Q 348 138 378 98" style="stroke-width:1.7;opacity:.6" />
+      </svg>
+      <div class="panel">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" data-i18n-srcset="panelDark" />
+          <img data-i18n-src="panelLight" alt="" width="272" height="318" />
+        </picture>
+      </div>
+    </div>
+
+    <section class="early" id="early">
+      <h2 data-i18n="eaTitle"></h2>
+      <p class="body" data-i18n="eaBody"></p>
+      <div class="buy">
+        <span class="price">US$9</span>
+        <span class="pill pill--off" aria-disabled="true" data-i18n="soon"></span>
+      </div>
+      <p class="note" data-i18n="priceNote"></p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <span>© 2026 ffiblab</span>
+      <nav>
+        <a href="../" >ffiblab</a>
+        <a href="privacy/" data-i18n="privacy"></a>
+        <a href="refund/" data-i18n="refund"></a>
+        <a href="mailto:hello@ffiblab.com" data-i18n="contact"></a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const STRINGS = {
+      ko: {
+        heroTitle: "그리면, 소리가 난다.",
+        heroLede: "펜 태블릿으로 선을 그으면 연필 소리가 손을 따라옵니다. 직접 녹음한 연필 소리가 필압과 속도에 맞춰 실시간으로 납니다.",
+        soon: "출시 준비 중",
+        heroNote: "14일 동안 무료 · macOS 14 이상 · 펜 태블릿 필요",
+        panelLight: "panel-korean.png",
+        panelDark: "panel-korean-dark.png",
+        eaTitle: "지금은 연필 하나.",
+        eaBody: "만년필, 크레용, 마커를 차례로 더합니다.",
+        priceNote: "한 번 구매로 평생 이용 · 새 화구 포함",
+        privacy: "개인정보 처리방침", refund: "환불 정책", contact: "문의",
+      },
+      en: {
+        heroTitle: "Draw, and hear it.",
+        heroLede: "Graintone plays pencil-on-paper sound as you draw with a pen tablet. Recorded from a real pencil, it follows your pressure and speed in real time.",
+        soon: "Coming soon",
+        heroNote: "Free for 14 days · macOS 14 or later · Pen tablet required",
+        panelLight: "panel-english.png",
+        panelDark: "panel-english-dark.png",
+        eaTitle: "One pencil, for now.",
+        eaBody: "Fountain pen, crayon and marker are on the way.",
+        priceNote: "Buy once, use it forever · New tools included",
+        privacy: "Privacy", refund: "Refund", contact: "Contact",
+      },
+    };
+
+    function setLang(lang) {
+      const dict = STRINGS[lang] || STRINGS.en;
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const v = dict[el.dataset.i18n];
+        if (v != null) el.textContent = v;
+      });
+      document.querySelectorAll("[data-i18n-src]").forEach((el) => {
+        const v = dict[el.dataset.i18nSrc];
+        if (v != null) el.src = v;
+      });
+      document.querySelectorAll("[data-i18n-srcset]").forEach((el) => {
+        const v = dict[el.dataset.i18nSrcset];
+        if (v != null) el.srcset = v;
+      });
+      document.querySelectorAll(".lang button").forEach((b) => {
+        b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+      });
+      try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
+    }
+
+    document.querySelectorAll(".lang button").forEach((b) => {
+      b.addEventListener("click", () => setLang(b.dataset.lang));
+    });
+
+    let initial = null;
+    try { initial = localStorage.getItem("ffiblab-lang"); } catch (e) {}
+    if (!initial) initial = (navigator.language || "en").startsWith("ko") ? "ko" : "en";
+    setLang(initial);
+  </script>
+</body>
+</html>

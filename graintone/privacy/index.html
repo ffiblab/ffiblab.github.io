@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Graintone</title>
+  <meta name="description" content="Graintone privacy policy — what you draw never leaves your device." />
+  <link rel="icon" type="image/svg+xml" href="../appicon.svg" />
+  <link rel="stylesheet" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <style>
+    :root {
+      --ink: #22262C;
+      --ink-2: rgba(34, 38, 44, 0.64);
+      --ink-3: rgba(34, 38, 44, 0.44);
+      --paper: #F6F7F9;
+      --tile: #E3E6EA;
+      --hair: rgba(34, 38, 44, 0.12);
+      --button: #22262C;
+      --button-text: #FFFFFF;
+      --stroke: rgba(34, 38, 44, 0.78);
+      --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+              "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* 어두운 화면은 앱의 어두운 표면(#2E2E2E)과 같은 무채색으로 맞춘다. 쪽 < 타일 < 패널 순으로 밝다. */
+        --ink: #EDEDED;
+        --ink-2: rgba(237, 237, 237, 0.66);
+        --ink-3: rgba(237, 237, 237, 0.44);
+        --paper: #18181A;
+        --tile: #222223;
+        --hair: rgba(237, 237, 237, 0.14);
+        --button: #EDEDED;
+        --button-text: #18181A;
+        --stroke: rgba(237, 237, 237, 0.8);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      word-break: keep-all;
+    }
+    a { color: inherit; }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── 위 줄: 이름과 언어 ── */
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .name {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+    .lang { display: flex; gap: 4px; }
+    .lang button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--ink-3);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 44px;
+      min-height: 36px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .lang button[aria-pressed="true"] { color: var(--ink); background: var(--tile); }
+    .lang button:focus-visible, .pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    .doc { max-width: 680px; padding: clamp(32px, 7vh, 72px) 0 clamp(56px, 10vh, 104px); }
+    .doc h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.12; }
+    .doc .updated { margin-top: 12px; font-size: 13px; color: var(--ink-3); }
+    .doc section { margin-top: 36px; }
+    .doc h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+    .doc p { margin-top: 10px; font-size: 16px; line-height: 1.7; color: var(--ink-2); }
+    .doc a { color: var(--ink); text-underline-offset: 3px; }
+    [data-show] { display: none; }
+    html[lang="ko"] [data-show="ko"], html[lang="en"] [data-show="en"] { display: block; }
+    html[lang="ko"] .en, html[lang="en"] .ko { display: none; }
+    footer { border-top: 1px solid var(--hair); }
+    .foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 24px; padding-bottom: 40px; font-size: 13px; color: var(--ink-3); }
+    .foot nav { display: flex; gap: 20px; flex-wrap: wrap; }
+    .foot a { text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <header class="wrap top">
+    <a class="name" href="../">Graintone</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
+      <button type="button" data-lang="en" aria-pressed="false">English</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <article class="doc" data-show="ko"><h1>개인정보 처리방침</h1><p class="updated">마지막 수정: 2026년 10월</p><section><h2>짧게 말하면</h2><p>그리는 내용은 기기를 떠나지 않습니다. Graintone에는 분석 도구도 사용 기록 수집도 추적도 없습니다. 알려 주시지 않는 한, 우리는 앱이 어떻게 쓰이는지 알지 못합니다.</p><p>앱이 스스로 하는 연결은 라이선스 확인과 업데이트 확인 두 가지뿐이고, 둘 다 아래에 적었습니다.</p></section><section><h2>기기에 남는 것</h2><p>Graintone은 펜 태블릿의 입력(필압, 속도, 기울기)을 읽어 그리는 동안 소리를 만듭니다. 이 입력은 기기 안에서 바로 처리되고 저장하거나 보내지 않습니다. 화면의 내용이나 키보드 입력은 읽지 않습니다.</p><p>설정(음량, 질감, 필압 곡선, 단축키, 언어)은 사용자의 기기에만 저장됩니다.</p><p>문제 해결을 위해 사용자가 직접 진단 모드로 실행한 경우에만 진단 기록이 기기에 남습니다. 이 기록은 자동으로 보내지 않습니다.</p></section><section><h2>라이선스</h2><p>라이선스 키를 등록하면 앱은 결제를 맡고 있는 Polar에 세 가지를 보냅니다: 라이선스 키, 기기를 구분하기 위한 이름(컴퓨터 이름), 운영체제 종류와 앱 버전. 이름은 Polar의 고객 화면에서 어느 기기가 등록되어 있는지 알아보는 데 쓰입니다.</p><p>등록한 뒤에는 앱을 켤 때와 하루에 한 번쯤, 그 키가 아직 유효한지 Polar에 묻습니다. 이때 보내는 것은 라이선스 키와 등록 번호뿐입니다. 인터넷이 연결되어 있지 않아도 등록은 유지됩니다.</p><p>결제는 Polar가 판매자를 대신해 처리합니다. 우리는 주문 확인과 지원을 위해 구매에 쓴 이메일 주소와 주문 내역을 Polar를 통해 볼 수 있고, 카드 정보는 볼 수 없습니다. Polar의 개인정보 처리방침은 <a href="https://polar.sh/legal/privacy">polar.sh/legal/privacy</a>에 있습니다.</p></section><section><h2>업데이트 확인</h2><p>앱은 새 버전이 있는지 우리의 배포 주소(GitHub에서 제공)에 하루에 한 번쯤 묻습니다. 새 버전은 사용자가 누를 때만 내려받아 설치합니다. 다른 웹 요청과 마찬가지로 이 요청을 받는 쪽은 IP 주소를 알게 됩니다.</p></section><section><h2>이 웹사이트</h2><p>이 웹사이트는 GitHub Pages에서 제공합니다. 쿠키도 분석 도구도 추적 스크립트도 쓰지 않습니다. 쪽을 보내 주는 GitHub와 글꼴을 보내 주는 jsDelivr는, 파일을 보내는 과정에서 IP 주소와 브라우저 정보를 받습니다.</p></section><section><h2>문의</h2><p>이 방침에 대해 궁금한 점은 <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>으로 알려 주세요.</p></section></article>
+    <article class="doc" data-show="en"><h1>Privacy Policy</h1><p class="updated">Last updated: October 2026</p><section><h2>The short version</h2><p>What you draw never leaves your device. Graintone has no analytics, no telemetry, and no tracking of any kind — we have no idea how you use the app unless you tell us.</p><p>The app makes exactly two connections on its own — a license check and an update check — and both are described below.</p></section><section><h2>What stays on your device</h2><p>Graintone reads pen tablet input — pressure, speed, tilt — to generate sound as you draw. That input is processed locally and is never stored or transmitted. The app does not read your screen or your keystrokes.</p><p>Your settings — volume, tone, pressure curve, shortcuts, and language — are stored only on your own machine.</p><p>A diagnostic log is written to your device only if you start the app in diagnostic mode yourself. It is never sent automatically.</p></section><section><h2>License</h2><p>When you register a license key, the app sends three things to Polar, which handles our payments: the license key, a name for the activation (your computer's name), and the operating system and app version. The name lets you tell your devices apart in Polar's customer portal.</p><p>After that, the app asks Polar whether the key is still valid — once at launch and roughly once a day. That request contains only the license key and the activation identifier. Your license keeps working while you are offline.</p><p>Polar processes payments as our merchant of record. We can see the email address used for the purchase and the order details through Polar, for order confirmation and support; we never see card details. Polar's privacy policy is at <a href="https://polar.sh/legal/privacy">polar.sh/legal/privacy</a>.</p></section><section><h2>Update check</h2><p>The app asks our release feed (served by GitHub) whether a newer version exists, roughly once a day. A new version is downloaded and installed only when you choose to. Like any web request, this tells the host your IP address.</p></section><section><h2>This website</h2><p>This website is hosted on GitHub Pages. We use no cookies, no analytics, and no tracking scripts. GitHub, which serves the pages, and jsDelivr, which serves the typeface, receive your IP address and browser details in the course of serving files.</p></section><section><h2>Questions</h2><p>If you have any questions about this policy, reach out at <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>.</p></section></article>
+  </main>
+  <footer>
+    <div class="wrap foot">
+      <span>© 2026 ffiblab</span>
+      <nav>
+        <a href="../">Graintone</a>
+        <a href="../privacy/"><span class="ko">개인정보 처리방침</span><span class="en">Privacy</span></a>
+        <a href="../refund/"><span class="ko">환불 정책</span><span class="en">Refund</span></a>
+        <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>
+      </nav>
+    </div>
+  </footer>
+  <script>
+    function setLang(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+      try { localStorage.setItem("graintone-lang", lang); } catch (e) {}
+    }
+    document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
+    let saved = null; try { saved = localStorage.getItem("graintone-lang"); } catch (e) {}
+    setLang(saved || ((navigator.language || "en").toLowerCase().startsWith("ko") ? "ko" : "en"));
+  </script>
+</body>
+</html>
