@@ -22,6 +22,7 @@
       --button: #22262C;
       --button-text: #FFFFFF;
       --graphite: 34, 38, 44;          /* 타일에 그려지는 연필 선의 색(r, g, b) */
+      --spoon: #2563EB;                /* ffiblab 워드마크의 점. 이 쪽에서 색이 있는 것은 이 점 하나다 */
       --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
               "Apple SD Gothic Neo", "Segoe UI", sans-serif;
     }
@@ -37,6 +38,7 @@
         --button: #EDEDED;
         --button-text: #18181A;
         --graphite: 237, 237, 237;
+        --spoon: #3B82F6;
       }
     }
 
@@ -59,6 +61,15 @@
       justify-content: space-between;
       height: 64px;
     }
+    .where { display: flex; align-items: baseline; gap: 10px; }
+    .studio {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      text-decoration: none;
+    }
+    .studio i { font-style: normal; color: var(--spoon); }
+    .slash { font-size: 15px; color: var(--ink-3); }
     .name {
       font-size: 15px;
       font-weight: 600;
@@ -80,7 +91,7 @@
       cursor: pointer;
     }
     .lang button[aria-pressed="true"] { color: var(--ink); background: var(--tile); }
-    .lang button:focus-visible, .pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .lang button:focus-visible, .pill:focus-visible, .where a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
     /* ── 첫 화면: 아이콘, 한 문장, 버튼 하나 ── */
     .hero { text-align: center; padding: clamp(40px, 8vh, 96px) 0 clamp(40px, 7vh, 80px); }
@@ -219,7 +230,12 @@
 </head>
 <body>
   <header class="wrap top">
-    <a class="name" href="./">Graintone</a>
+    <!-- 왼쪽 위의 워드마크는 메인(ffiblab.com)과 같은 자리, 같은 크기다. 누르면 메인으로 간다. -->
+    <div class="where">
+      <a class="studio" href="../" aria-label="ffiblab">ffiblab<i>.</i></a>
+      <span class="slash" aria-hidden="true">/</span>
+      <a class="name" href="./">Graintone</a>
+    </div>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
       <button type="button" data-lang="en" aria-pressed="false">English</button>

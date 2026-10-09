@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ffiblab</title>
-  <meta name="description" content="당신의 모든 순간에, 즐거움 한 스푼. ffiblab은 일상의 도구에 즐거움을 더하는 앱을 만듭니다. A spoonful of delight, in every moment." />
+  <meta name="description" content="당신의 모든 순간에, 즐거움 한 스푼. A spoonful of delight, in every moment." />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
@@ -12,328 +12,202 @@
   <meta property="og:url" content="https://ffiblab.com/" />
   <meta property="og:title" content="ffiblab" />
   <meta property="og:description" content="당신의 모든 순간에, 즐거움 한 스푼. A spoonful of delight, in every moment." />
-  <meta property="og:image" content="https://ffiblab.com/assets/og-pensound.png" />
+  <meta property="og:image" content="https://ffiblab.com/assets/og-ffiblab.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@ffiblab" />
   <meta name="twitter:title" content="ffiblab" />
   <meta name="twitter:description" content="당신의 모든 순간에, 즐거움 한 스푼. A spoonful of delight, in every moment." />
-  <meta name="twitter:image" content="https://ffiblab.com/assets/og-pensound.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <meta name="twitter:image" content="https://ffiblab.com/assets/og-ffiblab.png" />
   <link rel="stylesheet" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-  <link rel="stylesheet" href="assets/tokens.css" />
   <style>
-    /* ── 페이지 구조 ── */
-    .frame {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 clamp(20px, 5vw, 64px);
+    /* ffiblab의 쪽이 지키는 세 가지:
+       1. 진짜만 보인다: 보이는 것은 실제 앱의 아이콘과 화면이다. 꾸미는 무늬와 지어낸 그림을 두지 않는다.
+       2. 한 스푼: 한 쪽에 색이 있는 것은 워드마크의 점 하나다. 한 화면은 한 가지만 말한다.
+       3. 손을 따른다: 저절로 움직이는 것이 없다.
+       만든 앱은 선반에 놓인 물건처럼 선 위에 선다. 앱이 늘면 옆에 놓인다. */
+    :root {
+      --ink: #22262C;
+      --ink-2: rgba(34, 38, 44, 0.64);
+      --ink-3: rgba(34, 38, 44, 0.44);
+      --paper: #F6F7F9;
+      --tile: #E3E6EA;
+      --hair: rgba(34, 38, 44, 0.12);
+      --spoon: #2563EB;                /* 한 스푼: 이 쪽에서 색이 있는 것은 이 점 하나다 */
+      --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+              "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #EDEDED;
+        --ink-2: rgba(237, 237, 237, 0.66);
+        --ink-3: rgba(237, 237, 237, 0.44);
+        --paper: #18181A;
+        --tile: #222223;
+        --hair: rgba(237, 237, 237, 0.14);
+        --spoon: #3B82F6;
+      }
     }
 
-    /* ── 네비 ── */
-    header {
-      border-bottom: var(--line) solid var(--border);
-      position: relative;
-      z-index: 2;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      word-break: keep-all;
     }
-    .nav {
+    a { color: inherit; }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── 위 줄: 워드마크와 언어 ── */
+    .top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 18px;
-      padding-bottom: 18px;
+      height: 64px;
     }
-    .nav-mark {
-      font-size: 15px;
+    .mark {
+      font-size: 21px;
       font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--fg);
+      letter-spacing: -0.04em;
       text-decoration: none;
     }
-    .nav-mark span { color: var(--accent); }
-
-    /* ── 히어로: 워드마크가 로고다 ── */
-    .hero {
-      padding-top: clamp(56px, 10vh, 128px);
-      padding-bottom: clamp(56px, 10vh, 128px);
-      position: relative;
-    }
-    .wordmark {
-      font-size: clamp(72px, 17vw, 208px);
-      text-transform: none;   /* 소문자 워드마크 — 유일한 대문자 규칙 예외 */
-    }
-    .wordmark .dot { color: var(--accent); }
-    .tagline {
-      margin-top: var(--space-4);
-      max-width: 560px;
-    }
-    .tagline .main {
-      font-size: clamp(20px, 2.6vw, 28px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.35;
-    }
-    .tagline .sub {
-      margin-top: 10px;
-      font-size: 14px;
+    .mark i, .say i { font-style: normal; color: var(--spoon); }      /* 색은 점에만 쓴다 */
+    .lang { display: flex; gap: 4px; }
+    .lang button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--ink-3);
+      font: inherit;
+      font-size: 13px;
       font-weight: 500;
-      color: rgba(0,0,0,0.55);
+      min-width: 44px;
+      min-height: 36px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .lang button[aria-pressed="true"] { color: var(--ink); background: var(--tile); }
+    .lang button:focus-visible, .thing a:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+    /* ── 한 문장 ── */
+    .say {
+      padding: clamp(56px, 13vh, 128px) 0 clamp(72px, 15vh, 144px);
+      font-size: clamp(34px, 5vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.18;
     }
 
-    /* 히어로 우측 기하 구성 — 장식이 아니라 그리드의 표명 (바우하우스식) */
-    .hero-geo {
-      position: absolute;
-      right: clamp(20px, 6vw, 96px);
-      top: clamp(56px, 10vh, 128px);
-      width: clamp(120px, 20vw, 240px);
-      aspect-ratio: 1;
-      display: none;
-    }
-    @media (min-width: 900px) { .hero-geo { display: block; } }
-    .hero-geo .sq {
-      position: absolute; inset: 0;
-      border: var(--line-thick) solid var(--border);
-      background: var(--bg);
-    }
-    .hero-geo .ci {
-      position: absolute;
-      width: 58%; aspect-ratio: 1;
-      border-radius: 50%;
-      background: var(--accent-bright);
-      right: -14%; bottom: -14%;
-    }
-    /* 두 획이 (62%, 38%)에서 만나 가로로 긴 내부 사각형을 이루고, 그 모서리가 파란 원 위를 지난다.
-       읽기: 왼쪽 모서리+가로획 = f, 세로획+가로획 = f, 세로획 = i, 세로획+원 = b → ffib
-       (블라인드 10표 중 5표로 선정된 비례) */
-    .hero-geo .ln {
-      position: absolute;
-      left: 62%; top: -12%;
-      width: var(--line-thick); height: calc(50% + var(--line-thick));
-      background: var(--border);
-    }
-    .hero-geo .ln-h {
-      position: absolute;
-      left: -12%; top: 38%;
-      width: calc(74% + var(--line-thick)); height: var(--line-thick);
-      background: var(--border);
-    }
+    /* ── 선반: 선 하나, 그 위에 앱이 선다 ── */
+    main.wrap { padding-bottom: clamp(96px, 18vh, 176px); }
+    .shelf { list-style: none; display: flex; flex-wrap: wrap; row-gap: 72px; }
+    .thing { flex: 0 0 320px; }
+    .rest { flex: 1 1 0; min-width: 0; }                 /* 빈 선반: 선이 오른쪽 끝까지 이어진다 */
+    .thing a { display: block; text-decoration: none; }
+    /* 아이콘 파일은 네모 둘레에 여백과 그림자가 있다. 네모(132)의 아랫변이 선에 닿게 맞춘다. */
+    .stand { display: block; position: relative; height: 132px; clip-path: inset(-32px -32px 0 -32px); }
+    .stand img { position: absolute; left: -16px; top: -16px; width: 164px; height: 164px; }
+    .tag { display: block; border-top: 1px solid var(--ink); padding: 22px 32px 0 0; }
+    .rest .tag { padding: 0; }
+    .title { display: block; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .title svg { width: 16px; height: 16px; margin-left: 6px; vertical-align: -1px; fill: none; stroke: var(--ink-3); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke 120ms linear; }
+    .thing a:hover .title svg { stroke: var(--ink); }
+    .line { display: block; margin-top: 6px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+    .meta { display: block; margin-top: 14px; font-size: 13px; color: var(--ink-3); }
 
-    /* ── 섹션 공통 ── */
-    section {
-      border-top: var(--line) solid var(--border);
-      padding-top: var(--space-4);
-      padding-bottom: var(--space-5);
-    }
-    .sec-head { margin-bottom: var(--space-4); }
-
-    /* ── 제품 카드: 반전 호버 ── */
-    .product {
-      display: grid;
-      grid-template-columns: 96px 1fr auto;
-      gap: var(--space-3);
+    footer { border-top: 1px solid var(--hair); }
+    .foot {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      border: var(--line) solid var(--border);
-      background: var(--muted);
-      padding: var(--space-3);
-      text-decoration: none;
-      color: var(--fg);
-      transition: background 150ms linear, color 150ms linear;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 24px;
+      padding-bottom: 40px;
+      font-size: 13px;
+      color: var(--ink-3);
     }
-    .product:hover { background: var(--accent); color: #fff; }
-    .product:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-    .product img { width: 96px; height: 96px; display: block; }
-    .product h3 {
-      font-size: clamp(22px, 3vw, 32px);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-    }
-    .product p {
-      margin-top: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.5;
-      color: rgba(0,0,0,0.6);
-      transition: color 150ms linear;
-    }
-    .product:hover p { color: rgba(255,255,255,0.85); }
-    .product .os {
-      margin-top: 10px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      transition: color 150ms linear;
-    }
-    .product:hover .os { color: #fff; }
-    .product .arrow {
-      font-size: 32px;
-      font-weight: 900;
-      transition: transform 150ms ease-out;
-    }
-    .product:hover .arrow { transform: translateX(6px); }
+    .foot a { text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+
     @media (max-width: 640px) {
-      .product { grid-template-columns: 64px 1fr; }
-      .product img { width: 64px; height: 64px; }
-      .product .arrow { display: none; }
+      .thing { flex-basis: 100%; }
     }
-
-    /* ── 연락처 ── */
-    .contact-mail {
-      display: inline-block;
-      font-size: clamp(20px, 3vw, 32px);
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-      text-decoration: none;
-      border-bottom: 3px solid var(--fg);
-      padding-bottom: 2px;
-      transition: color 150ms linear, border-color 150ms linear;
-    }
-    .contact-mail:hover { color: var(--accent); border-color: var(--accent); }
-
-    /* ── 푸터 ── */
-    footer {
-      border-top: var(--line) solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      color: rgba(0,0,0,0.5);
-    }
-    .foot-inner {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: var(--space-3);
-      padding-bottom: var(--space-4);
-    }
-    footer nav { display: flex; gap: 20px; }
-    footer a {
-      color: rgba(0,0,0,0.5);
-      text-decoration: none;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 11px;
-    }
-    footer a:hover { color: var(--accent); }
   </style>
 </head>
-<body class="tx-noise">
-  <header>
-    <div class="frame nav">
-      <a class="nav-mark" href="./">ffiblab<span>.</span></a>
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" data-lang="ko" aria-pressed="true">KO</button>
-        <button type="button" data-lang="en" aria-pressed="false">EN</button>
-      </div>
+<body>
+
+  <header class="wrap top">
+    <a class="mark" href="./" aria-label="ffiblab">ffiblab<i>.</i></a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
+      <button type="button" data-lang="en" aria-pressed="false">English</button>
     </div>
   </header>
 
-  <main>
-    <div class="hero tx-grid">
-      <div class="frame">
-        <h1 class="display wordmark">ffib<br />lab<span class="dot">.</span></h1>
-        <div class="tagline">
-          <p class="main" data-i18n="tagline"></p>
-          <p class="sub" data-i18n="taglineSub"></p>
-        </div>
-      </div>
-      <div class="hero-geo" aria-hidden="true">
-        <div class="sq"></div>
-        <div class="ln"></div>
-        <div class="ln-h"></div>
-        <div class="ci"></div>
-      </div>
-    </div>
+  <main class="wrap">
+    <h1 class="say"><span data-i18n="tagline"></span><i>.</i></h1>
 
-    <section id="products">
-      <div class="frame">
-        <div class="sec-head">
-          <span class="sec-label" data-i18n="secProducts"></span>
-        </div>
-        <a class="product" href="pensound/">
-          <img src="assets/pensound-icon.png" alt="" width="96" height="96" />
-          <div>
-            <h3>PenSound</h3>
-            <p data-i18n="pensoundDesc"></p>
-            <div class="os">macOS&ensp;·&ensp;<span data-i18n="windowsSoon"></span></div>
-          </div>
-          <span class="arrow" aria-hidden="true">→</span>
+    <ul class="shelf">
+      <li class="thing">
+        <a href="graintone/">
+          <span class="stand"><img src="graintone/appicon.svg" alt="" width="149" height="149" /></span>
+          <span class="tag">
+            <span class="title">Graintone<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+            <span class="line" data-i18n="graintoneLine"></span>
+            <span class="meta" data-i18n="graintoneMeta"></span>
+          </span>
         </a>
-      </div>
-    </section>
-
-    <section id="contact">
-      <div class="frame">
-        <div class="sec-head">
-          <span class="sec-label" data-i18n="secContact"></span>
-        </div>
-        <a class="contact-mail" href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>
-      </div>
-    </section>
+      </li>
+      <li class="rest" aria-hidden="true"><span class="stand"></span><span class="tag"></span></li>
+    </ul>
   </main>
 
   <footer>
-    <div class="frame foot-inner">
+    <div class="wrap foot">
       <span>© 2026 ffiblab</span>
-      <nav>
-        <a href="privacy/" data-i18n="privacy"></a>
-        <a href="refund/" data-i18n="refund"></a>
-      </nav>
+      <a href="mailto:hello@ffiblab.com">hello@ffiblab.com</a>
     </div>
   </footer>
 
   <script>
-    // ── 한/영 병기 (추후 언어 추가 = STRINGS에 항목 추가) ──
     const STRINGS = {
       ko: {
-        tagline: "당신의 모든 순간에,\n즐거움 한 스푼.",
-        taglineSub: "A spoonful of delight, in every moment.",
-        secProducts: "01 — 제품",
-        secContact: "02 — 연락처",
-        pensoundDesc: "타블렛에서 사라진 펜 소리를 되찾아주는 앱이에요.",
-        // 베타 모집 기간(2026-07-27 ~ 08-14) 한정 — 정본: PenSound docs/beta/recruit-copy.md §C
-        windowsSoon: "Windows 베타 — 테스터 모집 중",
-        privacy: "개인정보 처리방침",
-        refund: "환불 정책",
+        tagline: "당신의 모든 순간에,\n즐거움 한 스푼",
+        graintoneLine: "그리면, 소리가 난다.",
+        graintoneMeta: "macOS · 출시 준비 중",
       },
       en: {
-        tagline: "A spoonful of delight,\nin every moment.",
-        taglineSub: "당신의 모든 순간에, 즐거움 한 스푼.",
-        secProducts: "01 — Products",
-        secContact: "02 — Contact",
-        pensoundDesc: "The app that brings real pen sounds back to your drawing tablet.",
-        // ⚠️ 영문 정본 없음 — 국문 정본의 초벌 번역. 사장 확인 필요
-        windowsSoon: "Windows beta — testers wanted",
-        privacy: "Privacy",
-        refund: "Refund",
+        tagline: "A spoonful of delight,\nin every moment",
+        graintoneLine: "Draw, and hear it.",
+        graintoneMeta: "macOS · Coming soon",
       },
     };
-
     function setLang(lang) {
       const dict = STRINGS[lang] || STRINGS.en;
       document.documentElement.lang = lang;
       document.querySelectorAll("[data-i18n]").forEach((el) => {
         const v = dict[el.dataset.i18n];
         if (v == null) return;
-        el.innerHTML = v.replace(/\n/g, "<br />");   // 태그라인 줄바꿈
+        el.textContent = "";
+        v.split("\n").forEach((part, i) => {
+          if (i) el.appendChild(document.createElement("br"));
+          el.appendChild(document.createTextNode(part));
+        });
       });
-      document.querySelectorAll(".lang-toggle button").forEach((b) => {
+      document.querySelectorAll(".lang button").forEach((b) => {
         b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
       });
       try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
     }
-
-    document.querySelectorAll(".lang-toggle button").forEach((b) => {
+    document.querySelectorAll(".lang button").forEach((b) => {
       b.addEventListener("click", () => setLang(b.dataset.lang));
     });
-
     let initial = null;
     try { initial = localStorage.getItem("ffiblab-lang"); } catch (e) {}
     if (!initial) initial = (navigator.language || "en").startsWith("ko") ? "ko" : "en";
