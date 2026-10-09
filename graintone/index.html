@@ -21,7 +21,7 @@
       --hair: rgba(34, 38, 44, 0.12);
       --button: #22262C;
       --button-text: #FFFFFF;
-      --stroke: rgba(34, 38, 44, 0.78);
+      --graphite: 34, 38, 44;          /* 타일에 그려지는 연필 선의 색(r, g, b) */
       --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
               "Apple SD Gothic Neo", "Segoe UI", sans-serif;
     }
@@ -36,7 +36,7 @@
         --hair: rgba(237, 237, 237, 0.14);
         --button: #EDEDED;
         --button-text: #18181A;
-        --stroke: rgba(237, 237, 237, 0.8);
+        --graphite: 237, 237, 237;
       }
     }
 
@@ -130,15 +130,30 @@
       padding: 48px clamp(24px, 5vw, 64px);
       overflow: hidden;
     }
-    .sheet svg { width: 100%; height: auto; display: block; max-width: 520px; }
-    .sheet svg path { fill: none; stroke: var(--stroke); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-    .sheet-hint {
+    .draw { width: 100%; display: flex; justify-content: center; }
+    .draw canvas { width: 100%; display: block; }   /* 가장 넓은 폭은 스크립트가 자료에 맞춰 정한다 */
+    /* 소리는 눌러야 난다(브라우저가 소리 있는 자동 재생을 막는다). */
+    .sound {
       position: absolute;
       left: clamp(24px, 5vw, 64px);
-      bottom: 28px;
+      bottom: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+      padding: 0 14px 0 10px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
       font-size: 13px;
-      color: var(--ink-3);
+      font-weight: 500;
+      cursor: pointer;
     }
+    .sound:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .sound svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .sound[aria-pressed="true"] .off, .sound[aria-pressed="false"] .wave { display: none; }
     /* 캡처(272×318pt)에서 패널 카드(224×270pt, 모서리 18)만 잘라 보인다 */
     .panel {
       width: 224px;
@@ -196,7 +211,7 @@
         grid-template-columns: 1fr;
         justify-items: center;
         border-radius: 28px;
-        padding: 40px 24px 64px;
+        padding: 40px 24px 84px;   /* 아래는 소리 버튼 자리(24 + 36 + 24) */
       }
       .hero .pill { width: 100%; }
     }
@@ -221,25 +236,21 @@
       <p class="note" data-i18n="heroNote"></p>
     </div>
 
-    <div class="sheet">
-      <svg viewBox="0 0 520 220" aria-hidden="true">
-        <!-- 연필로 빠르게 그은 빗금. 줄마다 길이·굵기·세기가 조금씩 다르다. -->
-        <path d="M44 178 Q 64 118 100 58" style="stroke-width:2.4;opacity:.92" />
-        <path d="M72 186 Q 98 116 138 46" style="stroke-width:2.1;opacity:.84" />
-        <path d="M108 180 Q 130 124 170 60" style="stroke-width:2.5;opacity:.95" />
-        <path d="M142 190 Q 170 122 210 44" style="stroke-width:2;opacity:.8" />
-        <path d="M180 178 Q 202 128 240 68" style="stroke-width:2.3;opacity:.9" />
-        <path d="M216 186 Q 242 126 284 52" style="stroke-width:1.9;opacity:.76" />
-        <path d="M254 176 Q 276 128 312 74" style="stroke-width:2.2;opacity:.86" />
-        <path d="M292 182 Q 314 134 352 80" style="stroke-width:1.8;opacity:.7" />
-        <path d="M330 172 Q 348 138 378 98" style="stroke-width:1.7;opacity:.6" />
-      </svg>
+    <div class="sheet" id="sheet">
+      <!-- 실제로 그은 획을 다시 그린다. 소리는 그 손놀림을 앱의 엔진에 다시 넣어 낸 것이다(anim/*.json, anim/*.m4a). -->
+      <div class="draw">
+        <canvas id="draw" aria-hidden="true"></canvas>
+      </div>
       <div class="panel">
         <picture>
           <source media="(prefers-color-scheme: dark)" data-i18n-srcset="panelDark" />
           <img data-i18n-src="panelLight" alt="" width="272" height="318" />
         </picture>
       </div>
+      <button type="button" class="sound" id="sound" aria-pressed="false">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 7.8h2.6L10 4.6v10.8l-3.9-3.2H3.5z"/><path class="wave" d="M13 7.4a3.6 3.6 0 0 1 0 5.2M15 5.4a6.4 6.4 0 0 1 0 9.2"/><path class="off" d="M13.4 8l3.6 4M17 8l-3.6 4"/></svg>
+        <span id="sound-label"></span>
+      </button>
     </div>
 
     <section class="early" id="early">
@@ -271,6 +282,7 @@
         heroTitle: "그리면, 소리가 난다.",
         heroLede: "펜 태블릿으로 선을 그으면 연필 소리가 손을 따라옵니다. 직접 녹음한 연필 소리가 필압과 속도에 맞춰 실시간으로 납니다.",
         soon: "출시 준비 중",
+        soundOn: "소리 켜기", soundOff: "소리 끄기",
         heroNote: "14일 동안 무료 · macOS 14 이상 · 펜 태블릿 필요",
         panelLight: "panel-korean.png",
         panelDark: "panel-korean-dark.png",
@@ -283,6 +295,7 @@
         heroTitle: "Draw, and hear it.",
         heroLede: "Graintone plays pencil-on-paper sound as you draw with a pen tablet. Recorded from a real pencil, it follows your pressure and speed in real time.",
         soon: "Coming soon",
+        soundOn: "Sound on", soundOff: "Sound off",
         heroNote: "Free for 14 days · macOS 14 or later · Pen tablet required",
         panelLight: "panel-english.png",
         panelDark: "panel-english-dark.png",
@@ -312,7 +325,157 @@
         b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
       });
       try { localStorage.setItem("ffiblab-lang", lang); } catch (e) {}
+      if (window.graintoneDraw) window.graintoneDraw.setLang(lang);
     }
+
+    /* 타일의 애니메이션. 실제로 그은 획(위치·필압·시각)을 다시 그리고, 소리를 켜면 그때 앱이 낸 소리를 같은 시각에 튼다.
+       획의 모양은 조금 다듬어 두었다(떨림 고르기, 손을 글자 쪽으로). 시각은 그은 그대로다. */
+    window.graintoneDraw = (() => {
+      const canvas = document.getElementById("draw");
+      const button = document.getElementById("sound");
+      const label = document.getElementById("sound-label");
+      const sheet = document.getElementById("sheet");
+      const ctx = canvas.getContext("2d");
+      const HOLD = 2.2;                       // 다 그린 뒤 멈춰 있는 시간(초)
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const cache = {};
+      let lang = "ko", data = null, audio = null, soundOn = false, visible = true, started = 0, raf = 0;
+
+      /* 연필 붓. 선을 "얼마나 눌렀나"의 지도(map)에 먼저 그리고, 종이결보다 높은 곳에만 흑연을 얹는다.
+         선의 가운데는 거의 다 차고, 가장자리(옅은 테)는 결의 높은 곳에만 묻어 거칠어진다.
+         결은 종이의 자리마다 정해져 있다. 새로 그은 자리만 다시 계산한다. */
+      const map = document.createElement("canvas"), mctx = map.getContext("2d", { willReadFrequently: true });
+      const GRAIN = 256;
+      const grain = (() => {
+        let a = 20261008;
+        const r = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+        const half = GRAIN / 2, fine = new Float32Array(GRAIN * GRAIN), coarse = new Float32Array(half * half), g = new Float32Array(GRAIN * GRAIN);
+        for (let i = 0; i < fine.length; i++) fine[i] = r();
+        for (let i = 0; i < coarse.length; i++) coarse[i] = r();
+        for (let y = 0; y < GRAIN; y++) for (let x = 0; x < GRAIN; x++) {      // 잔 결 + 두 배 큰 결
+          const x0 = (x >> 1) % half, y0 = (y >> 1) % half, x1 = (x0 + 1) % half, y1 = (y0 + 1) % half, fx = (x & 1) / 2, fy = (y & 1) / 2;
+          const c = (coarse[y0 * half + x0] * (1 - fx) + coarse[y0 * half + x1] * fx) * (1 - fy) + (coarse[y1 * half + x0] * (1 - fx) + coarse[y1 * half + x1] * fx) * fy;
+          g[y * GRAIN + x] = 0.55 * fine[y * GRAIN + x] + 0.45 * c;
+        }
+        return g;
+      })();
+      let width = 0, dpr = 1, unit = 1, rgb = [34, 38, 44], cursor = [0, 1], drawnTo = -1;
+
+      function size() {
+        if (!data) return;
+        canvas.style.maxWidth = Math.round(data.height * data.aspect) + "px";   // 그림이 커질 수 있는 한도(자료에 적혀 있다)
+        width = canvas.clientWidth; dpr = window.devicePixelRatio || 1;
+        unit = Math.min(1, Math.max(0.6, canvas.parentElement.clientWidth / 480));   // 선의 굵기는 그림이 아니라 자리의 폭을 따른다(두 언어가 같은 연필)
+        const h = width / data.aspect;
+        canvas.style.height = h + "px";
+        canvas.width = map.width = Math.round(width * dpr); canvas.height = map.height = Math.round(h * dpr);
+        rgb = getComputedStyle(document.documentElement).getPropertyValue("--graphite").split(",").map(Number);
+        reset();
+      }
+      function reset() {
+        cursor = [0, 1]; drawnTo = -1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        mctx.setTransform(1, 0, 0, 1, 0, 0);
+        mctx.globalCompositeOperation = "source-over"; mctx.fillStyle = "#000"; mctx.fillRect(0, 0, map.width, map.height);
+        mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        mctx.lineCap = "round"; mctx.lineJoin = "round";
+        mctx.globalCompositeOperation = "lighten";       // 겹쳐도 더해지지 않고 큰 값만 남는다
+      }
+      function draw(t) {
+        if (!data || !width) return;
+        if (t < drawnTo) reset();
+        drawnTo = t;
+        const S = data.strokes;
+        let si = cursor[0], pi = cursor[1], x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+        outer: for (; si < S.length; si++, pi = 1) {
+          const s = S[si];
+          if (s[0][3] > t) break;
+          for (; pi < s.length; pi++) {
+            const a = s[pi - 1], b = s[pi];
+            if (b[3] > t) break outer;
+            const p = (a[2] + b[2]) / 2, w = (2.0 + 3.1 * p) * unit;      // 필압이 셀수록 굵고 진하게
+            const ax = a[0] * width, ay = a[1] * width, bx = b[0] * width, by = b[1] * width, r = w + 2;
+            mctx.beginPath(); mctx.moveTo(ax, ay); mctx.lineTo(bx, by);
+            mctx.lineWidth = w * 1.7; mctx.strokeStyle = "rgb(" + Math.round(92 * (0.5 + p)) + ",0,0)"; mctx.stroke();           // 옅은 테
+            mctx.lineWidth = w; mctx.strokeStyle = "rgb(" + Math.round(255 * Math.min(1, 0.6 + 0.5 * p)) + ",0,0)"; mctx.stroke();  // 가운데
+            x0 = Math.min(x0, ax - r, bx - r); x1 = Math.max(x1, ax + r, bx + r);
+            y0 = Math.min(y0, ay - r, by - r); y1 = Math.max(y1, ay + r, by + r);
+          }
+        }
+        cursor = [si, pi];
+        if (x1 < x0) return;
+        // 새로 그은 자리만: 지도의 값이 그 자리의 종이결보다 높은 만큼 흑연이 얹힌다
+        const X = Math.max(0, Math.floor(x0 * dpr)), Y = Math.max(0, Math.floor(y0 * dpr));
+        const W = Math.min(canvas.width, Math.ceil(x1 * dpr)) - X, H = Math.min(canvas.height, Math.ceil(y1 * dpr)) - Y;
+        if (W <= 0 || H <= 0) return;
+        const src = mctx.getImageData(X, Y, W, H).data, out = ctx.createImageData(W, H), d = out.data, g = 2 / dpr;
+        for (let y = 0, i = 0; y < H; y++) {
+          const row = (Math.floor((Y + y) * g) % GRAIN) * GRAIN;
+          for (let x = 0; x < W; x++, i += 4) {
+            const cov = src[i] / 255;
+            if (cov === 0) continue;
+            let v = (cov - grain[row + Math.floor((X + x) * g) % GRAIN] * 0.92) / 0.16;
+            if (v <= 0) continue;
+            if (v > 1) v = 1;
+            d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = Math.round(230 * v * (0.72 + 0.28 * cov));
+          }
+        }
+        ctx.putImageData(out, X, Y);
+      }
+      function now() {
+        if (soundOn && audio && !audio.paused) return audio.currentTime;
+        return (performance.now() - started) / 1000;
+      }
+      function restart() {
+        started = performance.now();
+        if (soundOn && audio) { audio.currentTime = 0; audio.play().catch(() => setSound(false)); }
+      }
+      function frame() {
+        raf = 0;
+        if (!data || !visible) return;
+        if (still) { draw(Infinity); return; }
+        let t = now();
+        if (soundOn && audio && audio.ended) t = data.duration + (performance.now() - endedAt) / 1000;
+        if (t >= data.duration + HOLD) { restart(); t = 0; }
+        draw(t);
+        raf = requestAnimationFrame(frame);
+      }
+      let endedAt = 0;
+      function setSound(on) {
+        soundOn = on;
+        button.setAttribute("aria-pressed", String(on));
+        label.textContent = (STRINGS[lang] || STRINGS.en)[on ? "soundOff" : "soundOn"];
+        if (!audio) return;
+        if (on) restart(); else { audio.pause(); started = performance.now() - audio.currentTime * 1000; }
+      }
+      function load(next) {
+        lang = STRINGS[next] ? next : "en";
+        const key = lang === "ko" ? "ko" : "en";
+        if (audio) audio.pause();
+        audio = new Audio("anim/" + key + ".m4a");
+        audio.preload = "none";
+        audio.addEventListener("ended", () => { endedAt = performance.now(); });
+        label.textContent = (STRINGS[lang] || STRINGS.en)[soundOn ? "soundOff" : "soundOn"];
+        const ready = (json) => { data = json; size(); restart(); if (!raf) raf = requestAnimationFrame(frame); };
+        if (cache[key]) ready(cache[key]);
+        else fetch("anim/" + key + ".json").then((r) => r.json()).then((json) => {
+          cache[key] = json;
+          if (key === (lang === "ko" ? "ko" : "en")) ready(json);   // 받는 사이에 언어가 바뀌었으면 그리지 않는다
+        }).catch(() => {});
+      }
+      button.addEventListener("click", () => setSound(!soundOn));
+      window.addEventListener("resize", () => { size(); if (still) draw(Infinity); });
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { size(); if (still) draw(Infinity); });
+      // 화면 밖이거나 탭이 가려지면 멈춘다. 소리도 같이 멈춘다.
+      const pause = (show) => {
+        visible = show;
+        if (!show) { if (audio) audio.pause(); cancelAnimationFrame(raf); raf = 0; }
+        else if (!raf) { if (soundOn && audio) restart(); else started = performance.now(); raf = requestAnimationFrame(frame); }
+      };
+      if ("IntersectionObserver" in window) new IntersectionObserver((e) => pause(e[0].isIntersecting && !document.hidden), { threshold: 0.2 }).observe(sheet);
+      document.addEventListener("visibilitychange", () => pause(!document.hidden));
+      return { setLang: load };
+    })();
 
     document.querySelectorAll(".lang button").forEach((b) => {
       b.addEventListener("click", () => setLang(b.dataset.lang));
