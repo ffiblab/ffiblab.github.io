@@ -26,7 +26,7 @@
     /* ffiblab의 쪽이 지키는 세 가지:
        1. 진짜만 보인다: 보이는 것은 실제 앱의 아이콘과 화면이다. 꾸미는 무늬와 지어낸 그림을 두지 않는다.
        2. 한 스푼: 한 쪽에 색이 있는 것은 워드마크의 점 하나다. 한 화면은 한 가지만 말한다.
-       3. 손을 따른다: 저절로 움직이는 것이 없다.
+       3. 손을 따른다: 되풀이해 움직이는 것이 없다. 움직임은 뜻을 보여 줄 때 한 번뿐이다(Graintone 아이콘의 연필심).
        만든 앱은 선반에 놓인 물건처럼 선 위에 선다. 앱이 늘면 옆에 놓인다. */
     :root {
       --ink: #22262C;
@@ -111,7 +111,7 @@
     .thing a { display: block; text-decoration: none; }
     /* 아이콘 파일은 네모 둘레에 여백과 그림자가 있다. 네모(132)의 아랫변이 선에 닿게 맞춘다. */
     .stand { display: block; position: relative; height: 132px; clip-path: inset(-32px -32px 0 -32px); }
-    .stand img { position: absolute; left: -16px; top: -16px; width: 164px; height: 164px; }
+    .stand img, .stand svg { position: absolute; left: -16px; top: -16px; width: 164px; height: 164px; }
     .tag { display: block; border-top: 1px solid var(--ink); padding: 22px 32px 0 0; }
     .rest .tag { padding: 0; }
     .title { display: block; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
@@ -156,7 +156,7 @@
     <ul class="shelf">
       <li class="thing">
         <a href="graintone/">
-          <span class="stand"><img src="graintone/appicon.svg" alt="" width="149" height="149" /></span>
+          <span class="stand"><svg class="gt-icon " viewBox="0 0 1024 1024" width="164" height="164" aria-hidden="true"><defs><filter id="s" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur in="SourceAlpha" stdDeviation="10"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="100" y="100" width="824" height="824" rx="185.4" fill="#E3E6EA" filter="url(#s)"/><g transform="translate(100 100) scale(8.24)" fill="#22262C"><g class="grain"><rect x="38.169" y="30.585" width="5.630" height="5.630" rx="1.182"/><rect x="46.851" y="30.967" width="4.866" height="4.866" rx="1.022"/><rect x="55.548" y="31.365" width="4.071" height="4.071" rx="0.855"/><rect x="64.267" y="31.783" width="3.234" height="3.234" rx="0.679"/><rect x="73.015" y="32.231" width="2.338" height="2.338" rx="0.491"/><rect x="81.812" y="32.729" width="1.343" height="1.343" rx="0.282"/><rect x="55.153" y="39.269" width="4.862" height="4.862" rx="1.021"/><rect x="63.952" y="39.769" width="3.863" height="3.863" rx="0.811"/><rect x="72.787" y="40.304" width="2.793" height="2.793" rx="0.586"/><rect x="81.682" y="40.898" width="1.604" height="1.604" rx="0.337"/><rect x="54.757" y="47.173" width="5.654" height="5.654" rx="1.187"/><rect x="63.638" y="47.754" width="4.491" height="4.491" rx="0.943"/><rect x="72.560" y="48.376" width="3.247" height="3.247" rx="0.682"/><rect x="81.551" y="49.067" width="1.865" height="1.865" rx="0.392"/><rect x="55.153" y="55.869" width="4.862" height="4.862" rx="1.021"/><rect x="63.952" y="56.369" width="3.863" height="3.863" rx="0.811"/><rect x="72.787" y="56.904" width="2.793" height="2.793" rx="0.586"/><rect x="81.682" y="57.498" width="1.604" height="1.604" rx="0.337"/><rect x="38.169" y="63.785" width="5.630" height="5.630" rx="1.182"/><rect x="46.851" y="64.167" width="4.866" height="4.866" rx="1.022"/><rect x="55.548" y="64.565" width="4.071" height="4.071" rx="0.855"/><rect x="64.267" y="64.983" width="3.234" height="3.234" rx="0.679"/><rect x="73.015" y="65.431" width="2.338" height="2.338" rx="0.491"/><rect x="81.812" y="65.929" width="1.343" height="1.343" rx="0.282"/></g><circle class="lead" cx="37.084" cy="50" r="20.5"/></g></svg></span>
           <span class="tag">
             <span class="title">Graintone<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
             <span class="line" data-i18n="graintoneLine"></span>
@@ -208,6 +208,54 @@
     document.querySelectorAll(".lang button").forEach((b) => {
       b.addEventListener("click", () => setLang(b.dataset.lang));
     });
+
+    /* Graintone 아이콘: 연필심(원)이 오른쪽에서 왼쪽으로 지나가고, 지나간 자리에 결(네모)이 남는다.
+       네모는 제자리에 그대로 있다. 심이 아직 지나지 않은 자리의 네모만 숨긴다(심과 네모는 같은 색이라 심 밑에서 바뀌는 것은 보이지 않는다). */
+    function graintoneLead(svg) {
+      const lead = svg.querySelector(".lead"), grain = svg.querySelector(".grain");
+      const dots = [...grain.children].map((el) => ({ el, cx: +el.getAttribute("x") + el.getAttribute("width") / 2 }));
+      const REST = 37.084, START = 62.916;      // 심의 자리: 심볼의 왼쪽 끝과 오른쪽 끝
+      const at = (p) => START + (REST - START) * p;
+      // p: 심이 간 만큼(0–1). kept: 결이 남은 데까지(안 주면 심의 자리까지).
+      function show(p, kept) {
+        if (kept == null) kept = p;
+        lead.setAttribute("cx", at(p));
+        grain.style.opacity = Math.min(1, kept / 0.12);      // 처음에 심 밖으로 보이는 구석의 작은 점은 움직이기 시작하면서 나타난다
+        for (const d of dots) d.el.style.visibility = d.cx > at(kept) ? "visible" : "hidden";
+      }
+      let raf = 0;
+      function play(time, wait, from, kept) {
+        cancelAnimationFrame(raf);
+        const p0 = from || 0, k0 = kept || 0, t0 = performance.now() + (wait || 0);
+        show(p0, Math.max(k0, p0));
+        const step = (now) => {
+          const k = Math.min(1, Math.max(0, (now - t0) / time));
+          const p = p0 + (1 - p0) * (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);      // 천천히 떠나 천천히 멎는다
+          show(p, Math.max(k0, p));
+          if (k < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      }
+      return { show, play, stop: () => cancelAnimationFrame(raf) };
+    }
+
+    // 아이콘이 보이면 한 번만 움직인다. "움직임 줄이기"를 켠 사람에게는 멈춘 그림 그대로다.
+    (() => {
+      const svg = document.querySelector(".stand svg");
+      if (!svg || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+      const lead = graintoneLead(svg);
+      lead.show(0);
+      let started = false;
+      const start = () => { if (started) return; started = true; seen.disconnect(); lead.play(800, 450); };
+      const seen = new IntersectionObserver((e) => { if (e[0].isIntersecting) start(); }, { threshold: 0.6 });
+      seen.observe(svg);
+      // 아이콘이 화면 안에 있는데도 위의 알림이 오지 않으면 그냥 움직인다(처음 모습에 멈춰 있지 않게).
+      setTimeout(() => {
+        const r = svg.getBoundingClientRect();
+        if (document.visibilityState === "visible" && r.top < window.innerHeight && r.bottom > 0) start();
+      }, 3000);
+    })();
+
     let initial = null;
     try { initial = localStorage.getItem("ffiblab-lang"); } catch (e) {}
     if (!initial) initial = (navigator.language || "en").startsWith("ko") ? "ko" : "en";
